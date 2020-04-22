@@ -1,11 +1,10 @@
 Package: hectordata
 Title: Prepare and format the input data for Hector, the Simple Climate Model 
 Version: 0.0.0.9000
-Authors@R: 
-c(person("Kalyn", "Dorheim", email = "kalyn.dorheim@pnnl.gov", role = c("cre", "aut"), comment = c(ORCID = "0000-0001-8093-8397")), 
+Authors@R:  c(person("Kalyn", "Dorheim", email = "kalyn.dorheim@pnnl.gov", role = c("cre", "aut"), comment = c(ORCID = "0000-0001-8093-8397")), 
     person("Matt", "Nicholson", email = "matthew.nicholson@pnnl.gov", role = c("ctb")), 
     person("Ben", "Bond-Lamberty", email = "BondLamberty@pnnl.gov", role = c("ctb")),
-    person("Chris", "Vernon", email = "chris.vernon@pnnl.gov", role = c("ctb"))
+    person("Chris", "Vernon", email = "chris.vernon@pnnl.gov", role = c("ctb")),
     person(given = "Alexey", family = "Shiklomanov", role = c("ctb"), email = "alexey.shiklomanov@gmail.com"))
 Description: This pacakge prepares, documents, and formats the inputs for Hector. 
 License: BSD 2-Clause, see LICENSE and DISCLAIMER files
