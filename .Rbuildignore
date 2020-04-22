@@ -4,3 +4,5 @@
 ^\.Rproj\.user$
 ^DISCLAIMER$
 ^LICENSE$
+^\.github$
+.Rprofile
