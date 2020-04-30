@@ -7,9 +7,6 @@
 #' @return Values of `x` converted to `to` units.
 #' @author Alexey Shiklomanov
 #' @export
-#' @examples
-#' ud_convert2(5, "Pg [C]", "Mt [CO2]")
-#' #> 18.32223
 ud_convert2 <- function(x, from, to) {
     udunits2::ud.convert(x, parse_chem(from), parse_chem(to))
 }

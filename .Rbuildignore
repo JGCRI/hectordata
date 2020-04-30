@@ -4,6 +4,7 @@
 ^\.Rproj\.user$
 ^DISCLAIMER$
 ^LICENSE$
-^\.github$
 .Rprofile
 ^data-raw$
+
+^\.github$
