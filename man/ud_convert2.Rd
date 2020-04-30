@@ -19,10 +19,6 @@ Values of \code{x} converted to \code{to} units.
 \description{
 Chemical symbol-aware unit conversion
 }
-\examples{
-ud_convert2(5, "Pg [C]", "Mt [CO2]")
-#> 18.32223
-}
 \author{
 Alexey Shiklomanov
 }

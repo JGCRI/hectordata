@@ -8,6 +8,8 @@ Authors@R: c(person("Kalyn", "Dorheim", email = "kalyn.dorheim@pnnl.gov", role =
     person(given = "Alexey", family = "Shiklomanov", role = c("ctb"), email = "alexey.shiklomanov@gmail.com"))
 Description: This pacakge prepares, documents, and formats the inputs for Hector. 
 Depends: R (>= 2.10)
+Imports:
+  udunits2 (>= 0.13)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

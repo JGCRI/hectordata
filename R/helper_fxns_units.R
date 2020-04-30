@@ -4,6 +4,7 @@
 #' @param from,to Units from/to which to convert. Syntax is identical to
 #'   [udunits2::ud.convert()] except that chemical symbols in hard brackets
 #'   (e.g. `[N2O]`) can be converted.
+#' @import udunits2
 #' @return Values of `x` converted to `to` units.
 #' @author Alexey Shiklomanov
 #' @export
