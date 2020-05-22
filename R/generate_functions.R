@@ -18,7 +18,7 @@ generate_input_tables <- function(scenarios, output_dir){
   rcmipCMIP6_scenario <- c("ssp370", "ssp434", "ssp460", "ssp119", "ssp126", "ssp245", "ssp534-over", "ssp585")
   
   # Assert that the scenarios to process are categorized scenarios. 
-  assertthat::assert_that(any(scenarios %in% c(rcmipCMIP6_scenario)))
+  assertthat::assert_that(any(scenarios %in% c(rcmipCMIP6_scenario)), msg = 'unrecognized scenarios')
   
   # Convert the CMIP phase 6 specfic scenarios.
   if(any(scenarios %in% rcmipCMIP6_scenario)){

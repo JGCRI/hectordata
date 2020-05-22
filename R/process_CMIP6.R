@@ -1,4 +1,5 @@
 ## License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
+# TODO should we include a check to make sure the historical time series is included? 
 
 #' Convert the the cmip rcmip inputs to the Hector inputs
 #'
@@ -78,11 +79,4 @@ convert_rcmipCMIP6_hector <- function(scenario = NULL){
   completed_data <- complete_missing_years(data = converted_cmip6, expected_years = 1700:2500)
   return(completed_data)
 }
-
-
-
-
-
-
-
 
