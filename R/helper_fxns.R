@@ -70,7 +70,7 @@ complete_missing_years <- function(data, expected_years = 1700:2500){
   
   # Order and group the data frame in prepration for interpolation.
   data_NAs <- data.table::setorder(data_NAs, variable, units, scenario, year)
-  completed_data <- data_NAs[ , value := ifelse(is.na(value), zoo::na.approx(value, na.rm = FALSE, rule = 2), value), keyby=c("variable", "units", "scenario")]
+  completed_data <- data_NAs[ , value:=ifelse(is.na(value), zoo::na.approx(value, na.rm = FALSE, rule = 2), value), keyby=c("variable", "units", "scenario")]
   return(completed_data)
 }
 
@@ -99,3 +99,48 @@ remove_spaces <- function(df, cols){
   df
   
 }
+
+#' Format the Hector input into the expected Hector input csv file
+#'
+#' @param x a data table containing the Hector input information
+#' @param filename character path for where to save the output. 
+#' @return csv files formatted to look like hector input tables. 
+#' @export
+save_output <- function(x, filename){
+  
+  # Check the inputs.
+  req_names <- c('scenario', 'year', 'variable', 'units', 'value')
+  assertthat::assert_that(data.table::is.data.table(x))
+  assertthat::assert_that(length(setdiff(req_names, names(x))) == 0, msg = paste0('Missing required names.'))
+  assertthat::assert_that(length(setdiff(names(x), req_names)) == 0, msg = 'Extra column names.')
+  scn_name <- unique(x$scenario)
+  assertthat::assert_that(length(scn_name) == 1)
+  
+  # Make sure that the data frame contains emissions or concentrations but not both. 
+  variable_names <- unique(x$variable)
+  emis <- any(grepl(pattern = 'emissions', x = x$variable))
+  conc <- any(grepl(pattern = 'constrain', x = x$variable))
+  # TODO add some sort of method to make sure that the data frame contains all of the required 
+  # emissions or constraints. 
+  assertthat::assert_that(sum(emis, conc)  == 1, msg = 'input data should include either emissions or constrained data not both.')
+  
+  # Transform the data frame 
+  input_data <- x[ , list(Date = year, variable, value)]
+  input_data <- dcast(input_data, Date ~ variable, value.var = 'value') 
+  
+  # Format a list of units that will be used to 
+  var_units <- unique(x[ , list(variable, units)])
+  units_list <- paste(c('; UNITS:', var_units$units), collapse = ', ')
+  
+  # Save the output
+  readr::write_csv(input_data, filename, append = FALSE, col_names = TRUE)
+  lines <- readLines(filename)
+  
+  new_lines <- append(c(paste0('; ', scn_name),
+                        # TODO would it be possible to have this print which version of hectordata was used?
+                        '; created by hectordata',
+                        units_list),
+                      lines)
+  writeLines(new_lines, filename)
+}
+

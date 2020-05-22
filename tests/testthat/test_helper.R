@@ -22,7 +22,7 @@ test_that('ud_convert2', {
   x <- 10
   ytrue <- x * biogas::molMass("C") / biogas::molMass("CO2")
   y <- ud_convert2(x, "kg [CO2]", "kg [C]")
-  expect_identical(y, ytrue)
+  testthat::expect_identical(y, ytrue)
   
 })
 
@@ -50,3 +50,40 @@ test_that('complete_missing_years', {
   
 })
 
+test_that('save_output', {
+  
+  # Quickly run hector to pull generate some emissions, 
+  core <- hector::newcore(system.file('input/hector_rcp45.ini', package = 'hector'))
+  hector::run(core)
+  emission_vars <- c(EMISSIONS_BC(), EMISSIONS_CO())
+  emissions <- hector::fetchvars(core, vars = emission_vars, dates = 1900:2100, scenario = 'rcp45' )
+  emissions <- data.table::as.data.table(emissions)
+    
+  # Save the output files
+  temp_file <- tempfile()
+  
+  # Make sure that errors are thrown. 
+  xx <- emissions[ , list(scenario, year)]
+  testthat::expect_error(save_output(xx, filename = temp_file), 'Missing required names.')
+  
+  xx <- emissions
+  xx$fake <- 'a column of fake data'
+  testthat::expect_error(save_output(xx, filename = temp_file), 'Extra column names.')
+  
+  
+  # Make sure that the emissions inputs can be converted.
+  save_output(emissions, filename = temp_file)
+  lines <- readLines(temp_file)
+  
+  testthat::expect_equal(lines[[1]], "; rcp45")
+  testthat::expect_equal(lines[[2]], "; created by hectordata")
+  testthat::expect_true(grepl(x = lines[[3]], pattern = "; UNITS"))
+  
+  data <- read.csv(temp_file, comment.char = ';')
+  testthat::expect_true(all(names(data) %in% c("Date", emission_vars)))
+  testthat::expect_true(is.data.frame(data))
+  
+  # Remove the temp file
+  file.remove(temp_file)
+  
+})

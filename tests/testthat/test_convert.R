@@ -18,8 +18,6 @@ test_that('convert_rcmipCMIP6_hector', {
   ztrue <- x * (biogas::molMass("S") / biogas::molMass("SO2"))
   z     <- ud_convert2(x, from = so2_entry$rcmip_udunits, to = so2_entry$hector_udunits)/1000
 
-  
-
   # The RCMIP activities do include scenarios from the 5th CMIP.
   # Use one of the RCP scenarios to make sure that the function
   # sets it up properly.
