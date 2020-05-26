@@ -55,7 +55,7 @@ test_that('save_output', {
   # Quickly run hector to pull generate some emissions, 
   core <- hector::newcore(system.file('input/hector_rcp45.ini', package = 'hector'))
   hector::run(core)
-  emission_vars <- c(EMISSIONS_BC(), EMISSIONS_CO())
+  emission_vars <- c(hector::EMISSIONS_BC(), hector::EMISSIONS_CO())
   emissions <- hector::fetchvars(core, vars = emission_vars, dates = 1900:2100, scenario = 'rcp45' )
   emissions <- data.table::as.data.table(emissions)
     
