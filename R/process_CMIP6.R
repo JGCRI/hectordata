@@ -79,4 +79,3 @@ convert_rcmipCMIP6_hector <- function(scenario = NULL){
   completed_data <- complete_missing_years(data = converted_cmip6, expected_years = 1700:2500)
   return(completed_data)
 }
-

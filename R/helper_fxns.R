@@ -11,7 +11,7 @@
 #' @author Alexey Shiklomanov
 #' @noRd 
 ud_convert2 <- function(x, from, to) {
-  udunits2::ud.convert(x, parse_chem(from), parse_chem(to))
+  return(udunits2::ud.convert(x, parse_chem(from), parse_chem(to)))
 }
 
 #' Chemical symbol-aware unit conversion
@@ -31,7 +31,7 @@ parse_chem <- function(unit) {
     )
     m <- regexpr(rx, unit2)
   }
-  unit2
+  return(unit2)
 }
 
 #' Calculate the molar mass for a chemical species
@@ -41,7 +41,7 @@ parse_chem <- function(unit) {
 #' @author Alexey Shiklomanov
 #' @noRd
 get_molmass <- function(s) {
-  biogas::molMass(gsub("\\[|\\]", "", s))
+  return(biogas::molMass(gsub("\\[|\\]", "", s)))
 }
 
 #' Fill in the missing values 
@@ -96,7 +96,7 @@ remove_spaces <- function(df, cols){
     
   })
   
-  df
+  return(df)
   
 }
 
@@ -142,5 +142,6 @@ save_output <- function(x, filename){
                         units_list),
                       lines)
   writeLines(new_lines, filename)
+  return(filename)
 }
 
