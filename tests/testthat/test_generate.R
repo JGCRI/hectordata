@@ -14,3 +14,16 @@ test_that('generate_input_tables', {
   file.remove(files)
   
 })
+
+
+test_that("generate_volanic_inputs", {
+  
+  dir <- tempdir()
+  
+  file <- generate_volanic_inputs(dir)
+  testthat::expect_true(file.exists(file))
+  
+  file.remove(file)
+  
+  
+})
