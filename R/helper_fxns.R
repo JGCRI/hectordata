@@ -90,13 +90,12 @@ remove_spaces <- function(df, cols){
   assertthat::assert_that(is.data.frame(df))
   assertthat::assert_that(assertthat::has_name(x = df, which = cols))
 
-  
-  lapply(cols, function(col){
+  for(i in cols){
     
-    assertthat::assert_that(is.character(df[[col]]))
-    df[[col]] <- gsub(pattern = '^ ', replacement = '', x = df[[col]])
+    assertthat::assert_that(is.character(df[[i]]) | is.factor(df[[i]]))
+    df[[i]] <-  gsub(pattern = '^ ', replacement = '', x = df[[i]])
     
-  })
+  }
   
   return(df)
   

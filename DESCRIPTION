@@ -10,7 +10,8 @@ Description: This pacakge prepares, documents, and formats the inputs for Hector
 Depends: R (>= 2.10)
 Imports:
     udunits2 (>= 0.13),
-    data.table
+    data.table, 
+    zoo
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
