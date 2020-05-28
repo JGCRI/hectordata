@@ -9,7 +9,8 @@ Authors@R: c(person("Kalyn", "Dorheim", email = "kalyn.dorheim@pnnl.gov", role =
 Description: This pacakge prepares, documents, and formats the inputs for Hector. 
 Depends: R (>= 2.10)
 Imports:
-  udunits2 (>= 0.13)
+    udunits2 (>= 0.13),
+    data.table
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
