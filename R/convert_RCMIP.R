@@ -44,7 +44,7 @@ convert_rcmipCMIP6_hector <- function(scenario = NULL){
   # only the scenarios of intrest will be converted. Remove the NA entries that arose when converted from
   # the wide to long format.
   raw_inputs <- stats::na.omit(rbind(emiss_long, conc_long))
-  raw_inputs <- raw_inputs[Scenario %in% scenario  & Region == "World"][ , year :=  as.integer(year)]
+  raw_inputs <- raw_inputs[Scenario %in% scenario  & Region == "World"][ , year :=  as.integer(substr(year, 2, 5))]
   raw_inputs <- remove_spaces(df = raw_inputs, cols = c("Variable", "Mip_Era", "Model", "Scenario", "Region"))
   
   
