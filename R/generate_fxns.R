@@ -23,14 +23,22 @@ generate_input_tables <- function(scenarios, output_dir){
   assertthat::assert_that(any(scenarios %in% c(rcmipCMIP6_scenario)), msg = 'unrecognized scenarios')
 
   # Convert Inputs ------------------------------------------------------------------
+  # The scenario inputs are provided by different sources IIASA, RCMIP and so on. So 
+  # each set of scenarios must be processed with different rules. This series of if else 
+  # statements processes the scenario inputs to match Hector inputs based on their source.
   if(any(scenarios %in% rcmipCMIP6_scenario)){
-    # Convert the CMIP phase 6 specfic scenarios.
-    
+    # Convert the CMIP phase 6 specific scenarios, subset the rcmip CMIP6 scenarios
+    # from the scenarios argument to convert. 
     to_process <- intersect(rcmipCMIP6_scenario, scenarios)
     processed  <- convert_rcmipCMIP6_hector(to_process)
     hector_inputs <- rbind(hector_inputs, processed)
     
-  } # TODO expand to process other scenarios here such as the DECK and CMIP5 scenarios.
+  } else {
+    
+    stop('The ability to process non rcmip cmip6 scenarios has not been added yet. \n
+         See https://github.com/JGCRI/hectordata/issues/8')
+    
+  }
 
 
   # Split up the scenario emissions and concentration constraints.
@@ -38,7 +46,7 @@ generate_input_tables <- function(scenarios, output_dir){
   emiss_data <- hector_inputs[variable %in% vars[grepl(pattern = 'emissions', x = vars)], ]
   const_data <- hector_inputs[variable %in% vars[grepl(pattern = 'constrain', x = vars)], ]
 
-  # Set up the directory to save the
+  # Set up the directory to save them.
   input_dir <- file.path(output_dir, 'inputs')
   dir.create(input_dir, showWarnings = FALSE)
 

@@ -15,22 +15,27 @@ ud_convert2 <- function(x, from, to) {
 #' Chemical symbol-aware unit conversion
 #'
 #' @param unit a string of unit information and chemical information (C, N, N2O, ect.)
-#' @return a formated unit string
+#' @return a formatted unit string
 #' @author Alexey Shiklomanov
 #' @noRd 
 parse_chem <- function(unit) {
+  # Duplicate the original unit string, one will be modifed while the
+  # other retains the original information.
   unit2 <- unit
+  
+  # Determine if the string contains square brackets which indicates
+  # a subscript of a chemical formula. 
   rx <- "\\[.*?\\]"
   m <- regexpr(rx, unit2)
+  
+  # Update the units by the molar mass of the chemical formula. 
   while (m != -1) {
-    regmatches(unit2, m) <- sprintf(
-      "(1/%f)",
-      get_molmass(regmatches(unit2, m))
-    )
+    regmatches(unit2, m) <- sprintf("(1/%f)", get_molmass(regmatches(unit2, m)))
     m <- regexpr(rx, unit2)
   }
-  unit2
+  return(unit2)
 }
+
 
 #' Calculate the molar mass for a chemical species
 #'
@@ -48,12 +53,13 @@ get_molmass <- function(s) {
 #' @param expected_years the number of years to ensure there data, default set to 1700 to 2500
 #' @return a data table with interpolated data
 #' @importFrom zoo na.approx
+#' @importFrom assertthat assert_that
 complete_missing_years <- function(data, expected_years = 1700:2500){
   
   # Undefined global functions or variables
   scenario <- variable <- value <- NULL
   
-  assertthat::assert_that(assertthat::has_name(x = data, which = c('scenario', 'variable', 'units', 'year')))
+  assert_that(assertthat::has_name(x = data, which = c('scenario', 'variable', 'units', 'year')))
 
   # TODO this is hacky is there a  better way to do this?
   # Make a data table of the required years we want for each variable. This data table will 
@@ -74,51 +80,24 @@ complete_missing_years <- function(data, expected_years = 1700:2500){
   return(completed_data)
 }
 
-
-#' Drop " " from the begning of strings
-#' 
-#' In the case that conversion tables contain columns that begin with a space, as it the case in the 
-#' hector rcmip conversion table, this function will remove those spaces so that the resulting 
-#' data objects can be joined or merged with other data objects. 
-#'
-#' @param df a datatable that contains one or more vector columns. 
-#' @param cols a vector of the columns that contain strings that may begin with a " " character.
-#' @return a data object where if the column starts with a space in a character string it is removed.
-#' @noRd 
-remove_spaces <- function(df, cols){
-  
-  assertthat::assert_that(is.data.frame(df))
-  assertthat::assert_that(assertthat::has_name(x = df, which = cols))
-
-  for(i in cols){
-    
-    assertthat::assert_that(is.character(df[[i]]) | is.factor(df[[i]]))
-    df[[i]] <-  gsub(pattern = '^ ', replacement = '', x = df[[i]])
-    
-  }
-  
-  return(df)
-  
-}
-
-
 #' Format the Hector input into the expected Hector input csv file
 #'
 #' @param x a data table containing the Hector input information
 #' @param filename character path for where to save the output. 
 #' @return path to the csv file formatted as a Hector input table.  
 #' @export
+#' @importFrom assertthat assert_that
 save_hector_table <- function(x, filename){
   
   # Undefined global functions or variables:
   variable <- value <- NULL
   
-  assertthat::assert_that(data.table::is.data.table(x))
+  assert_that(data.table::is.data.table(x))
   req_names <- c('scenario', 'year', 'variable', 'units', 'value')
-  assertthat::assert_that(assertthat::has_name(x = x, which = req_names))
-  assertthat::assert_that(length(setdiff(names(x), req_names)) == 0, msg = 'Extra column names.')
+  assert_that(assertthat::has_name(x = x, which = req_names))
+  assert_that(length(setdiff(names(x), req_names)) == 0, msg = 'Extra column names.')
   scn_name <- unique(x$scenario)
-  assertthat::assert_that(length(scn_name) == 1)
+  assert_that(length(scn_name) == 1)
   
   # Make sure that the data frame contains emissions or concentrations but not both. 
   variable_names <- unique(x$variable)
@@ -127,11 +106,11 @@ save_hector_table <- function(x, filename){
   # TODO add some sort of method to make sure that the data frame contains all of the required 
   # emissions or constraints. Otherwise errors will not be triggered until trying to run the 
   # Hector core. 
-  assertthat::assert_that(sum(emis, conc)  == 1, msg = 'input data should include either emissions or constrained data not both.')
+  assert_that(sum(emis, conc)  == 1, msg = 'input data should include either emissions or constrained data not both.')
   
   # Transform the data frame into the wide format that Hector expects. 
   input_data <- x[ , list(Date = year, variable, value)]
-  input_data <- dcast(input_data, Date ~ variable, value.var = 'value') 
+  input_data <- data.table::dcast(input_data, Date ~ variable, value.var = 'value') 
   
   # TODO is there a way to skip saving this intermediate step? 
   # Save the output as csv, latter on it will be read in as a character to make 
