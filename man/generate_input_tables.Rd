@@ -4,13 +4,14 @@
 \alias{generate_input_tables}
 \title{Generate emission and concentration constraint input tables for Hector.}
 \usage{
-generate_input_tables(scenarios, output_dir)
+generate_input_tables(scenarios, output_dir, years)
 }
 \arguments{
 \item{scenarios}{a character vector of scenario names.}
 
 \item{output_dir}{a character of the full path to the directory location for
-the user to write the generated csv files to.}
+the user to write the generated csv files to.
+@param years a vector of the expected output years.}
 }
 \value{
 the location of the generated csv files.

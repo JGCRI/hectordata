@@ -10,6 +10,9 @@
 #' @noRd
 convert_rcmipCMIP6_hector <- function(scenario = NULL){
 
+  # Make sure that strings are not read in as factors. 
+  options(stringsAsFactors=FALSE)
+  
   # If there is no specified scenario then process all of the CMIP6 scenarios.
   if(is.null(scenario)){
     scenario <- c("ssp370", "ssp434", "ssp460", "ssp119", "ssp126",
@@ -18,45 +21,35 @@ convert_rcmipCMIP6_hector <- function(scenario = NULL){
 
   # Download the Minted data from the zenodo repository. 
   conc_data <- data.table::as.data.table(rpackageutils::remote_read("https://zenodo.org/record/3779281/files/rcmip-concentrations-annual-means-v4-0-0.csv?download=1"))
-  emiss_data <- data.table::as.data.table( rpackageutils::remote_read("https://zenodo.org/record/3779281/files/rcmip-emissions-annual-means-v4-0-0.csv?download=1"))
+  emiss_data <- data.table::as.data.table(rpackageutils::remote_read("https://zenodo.org/record/3779281/files/rcmip-emissions-annual-means-v4-0-0.csv?download=1"))
 
+  # Check inputs 
+  assert_that(is.integer(years))
+  
   # Make sure data exists for the scenario(s) selected to process. 
   data_scns <- unique(emiss_data$Scenario, conc_data$Scenario)
   available <- scenario %in% data_scns
   assert_that(all(available), msg = paste0('The following scenarios cannot be processed: ', paste(scenarios[!available], collapse = ', ')))
 
-
+  # Concatenate the long emissions and concentration data tables together and subset so that
+  # only the scenarios of interest will be converted.
+  raw_inputs <- rbind(conc_data, emiss_data, fill = TRUE)[Scenario %in% scenario  & Region == "World"]
+  
   # Determine the columns that contain identifier information, such as the model, scenario, region, variable,
   # unit, ect. These columns will be used to transform the data from being wide to long so that each row
   # corresponds to concentration for a specific year.
-  id_vars <- which(!grepl(pattern = "^X[[:digit:]]{4}", x = names(conc_data)))
-  conc_long <- melt.data.table(data = conc_data, id.vars = id_vars,
+  id_vars <- which(!grepl(pattern = "^X[[:digit:]]{4}", x = names(raw_inputs)))
+  raw_inputs <- melt.data.table(data = raw_inputs, id.vars = id_vars,
                                            variable.name = "year", value.name = "value",
                                            variable.factor = FALSE)
   
-
-
-  id_vars <- which(!grepl(pattern = "^X[[:digit:]]{4}", x = names(emiss_data)))
-  emiss_long <- melt.data.table(data = emiss_data, id.vars = id_vars,
-                                            variable.name = "year", value.name = "value",
-                                            variable.factor = FALSE)
-
-  # Concatenate the long emissions and concentration data tables together and subset so that
-  # only the scenarios of interest will be converted. Remove the NA entries that were added when converting from
-  # the wide to long format.
-  raw_inputs <- stats::na.omit(rbind(emiss_long, conc_long))
-  raw_inputs <- raw_inputs[Scenario %in% scenario  & Region == "World"][ , year :=  as.integer(substr(year, 2, 5))]
-  
-  # Remove trailing spaces from the RCMIP inputs. 
-  cols_to_modify <- which(names(raw_inputs) %in% c("Model", "Scenario", "Region", "Variable", "Unit", "Mip_Era"))
-  for(i in seq_along(cols_to_modify)){raw_inputs[[i]] <- trimws(raw_inputs[[i]], which = 'left')}
+  # Remove NAs and convert the year to an integer. 
+  raw_inputs <- stats::na.omit(raw_inputs[ , year :=  as.integer(substr(year, 2, 5))])
 
   # Add the conversion data table information to the raw data with an inner join so that only variables that
   # have conversion information will be converted. The raw inputs include values for variables that Hector
   # does not have that are required by other classes of simple climate models.
-  cols_to_modify   <- which(names(hectordata::rcmipCMIP6_conversion) %in% c("hector_variable", "rcmip_variable", "rcmip_udunits", "hector_udunits"))
   conversion_table <- hectordata::rcmipCMIP6_conversion
-  for(i in seq_along(cols_to_modify)){conversion_table[[i]] <- trimws(conversion_table[[i]], which = 'left')}
   input_conversion_table <- stats::na.omit(raw_inputs[conversion_table, on = c('Variable' = 'rcmip_variable'), nomatch=NA])
 
   # Convert the value column from RCMIP units to Hector units.
@@ -74,10 +67,7 @@ convert_rcmipCMIP6_hector <- function(scenario = NULL){
   # and renaming the columns from the input conversion table. Then add the converted values.
   converted_cmip6 <- input_conversion_table[, list(Scenario, year, hector_variable, hector_unit)]
   names(converted_cmip6) <- c('scenario', 'year', 'variable', 'units')
-  
   converted_cmip6[['value']] <- new_values
-
-  # Fill in the missing years.
-  completed_data <- complete_missing_years(data = converted_cmip6, expected_years = 1700:2500)
-  return(completed_data)
+  
+  return(converted_cmip6)
 }

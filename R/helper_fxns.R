@@ -53,15 +53,13 @@ get_molmass <- function(s) {
 #' @param expected_years the number of years to ensure there data, default set to 1700 to 2500
 #' @return a data table with interpolated data
 #' @importFrom zoo na.approx
-#' @importFrom assertthat assert_that
 complete_missing_years <- function(data, expected_years = 1700:2500){
   
   # Undefined global functions or variables
   scenario <- variable <- value <- NULL
   
-  assert_that(assertthat::has_name(x = data, which = c('scenario', 'variable', 'units', 'year')))
+  assertthat::assert_that(assertthat::has_name(x = data, which = c('scenario', 'variable', 'units', 'year')))
 
-  # TODO this is hacky is there a  better way to do this?
   # Make a data table of the required years we want for each variable. This data table will 
   # be used to  add NA values to the data table containing the inputs. 
   data_no_years <- unique(data[ , list(scenario, variable, units)])
@@ -86,16 +84,15 @@ complete_missing_years <- function(data, expected_years = 1700:2500){
 #' @param filename character path for where to save the output. 
 #' @return path to the csv file formatted as a Hector input table.  
 #' @export
-#' @importFrom assertthat assert_that
 save_hector_table <- function(x, filename){
   
   # Undefined global functions or variables:
   variable <- value <- NULL
   
-  assert_that(data.table::is.data.table(x))
+  assertthat::assert_that(data.table::is.data.table(x))
   req_names <- c('scenario', 'year', 'variable', 'units', 'value')
-  assert_that(assertthat::has_name(x = x, which = req_names))
-  assert_that(length(setdiff(names(x), req_names)) == 0, msg = 'Extra column names.')
+  assertthat::assert_that(assertthat::has_name(x = x, which = req_names))
+  assertthat::assert_that(length(setdiff(names(x), req_names)) == 0, msg = 'Extra column names.')
   scn_name <- unique(x$scenario)
   assert_that(length(scn_name) == 1)
   
@@ -103,16 +100,12 @@ save_hector_table <- function(x, filename){
   variable_names <- unique(x$variable)
   emis <- any(grepl(pattern = 'emissions', x = x$variable))
   conc <- any(grepl(pattern = 'constrain', x = x$variable))
-  # TODO add some sort of method to make sure that the data frame contains all of the required 
-  # emissions or constraints. Otherwise errors will not be triggered until trying to run the 
-  # Hector core. 
   assert_that(sum(emis, conc)  == 1, msg = 'input data should include either emissions or constrained data not both.')
   
   # Transform the data frame into the wide format that Hector expects. 
   input_data <- x[ , list(Date = year, variable, value)]
   input_data <- data.table::dcast(input_data, Date ~ variable, value.var = 'value') 
   
-  # TODO is there a way to skip saving this intermediate step? 
   # Save the output as csv, latter on it will be read in as a character to make 
   # is possible to add the header information required by Hector. 
   readr::write_csv(input_data, filename, append = FALSE, col_names = TRUE)
@@ -124,7 +117,6 @@ save_hector_table <- function(x, filename){
   
   # Add the header information. 
   final_lines <- append(c(paste0('; ', scn_name),
-                          # TODO would it be possible to have this print which version of hectordata was used?
                           '; created by hectordata',
                           units_list),
                         lines)

@@ -6,12 +6,15 @@
 #' @param scenarios a character vector of scenario names.
 #' @param output_dir a character of the full path to the directory location for
 #'  the user to write the generated csv files to.
+#'  @param years a vector of the expected output years. 
 #' @return the location of the generated csv files.
 #' @export
-generate_input_tables <- function(scenarios, output_dir){
+#' @importFrom assertthat assert_that
+generate_input_tables <- function(scenarios, output_dir, years){
 
   # Check to make sure that the output directory exstits.
-  assertthat::assert_that(dir.exists(output_dir))
+  assert_that(dir.exists(output_dir))
+  assert_that(is.numeric(years))
 
   # Create an empty hector_inputs data table.
   hector_inputs <- data.table::data.table()
@@ -20,7 +23,7 @@ generate_input_tables <- function(scenarios, output_dir){
   rcmipCMIP6_scenario <- c("ssp370", "ssp434", "ssp460", "ssp119", "ssp126", "ssp245", "ssp534-over", "ssp585")
 
   # Assert that the scenarios to process are categorized scenarios.
-  assertthat::assert_that(any(scenarios %in% c(rcmipCMIP6_scenario)), msg = 'unrecognized scenarios')
+  assert_that(any(scenarios %in% c(rcmipCMIP6_scenario)), msg = 'unrecognized scenarios')
 
   # Convert Inputs ------------------------------------------------------------------
   # The scenario inputs are provided by different sources IIASA, RCMIP and so on. So 
@@ -40,35 +43,39 @@ generate_input_tables <- function(scenarios, output_dir){
     
   }
 
-
-  # Split up the scenario emissions and concentration constraints.
-  vars <- unique(hector_inputs$variable)
-  emiss_data <- hector_inputs[variable %in% vars[grepl(pattern = 'emissions', x = vars)], ]
-  const_data <- hector_inputs[variable %in% vars[grepl(pattern = 'constrain', x = vars)], ]
-
+  # Interpolate the data over the missing years. 
+  hector_inputs <- complete_missing_years(hector_inputs, expected_years = years)
+  
+  # Add identifier information about if a variable is an emission or a constraint. 
+  hector_inputs[ , emiss_conc := ifelse(grepl(pattern = 'emission', x = variable), 'emission', NA_character_)]
+  hector_inputs[ , emiss_conc := ifelse(grepl(pattern = 'constrain', x = variable), 'constraint', emiss_conc)]
+  hector_inputs <- na.omit(hector_inputs)
+  
+  
+  
+  # Format and Save ------------------------------------------------------------------
+  # Save the Hector input tables. 
   # Set up the directory to save them.
   input_dir <- file.path(output_dir, 'inputs')
   dir.create(input_dir, showWarnings = FALSE)
 
-  # TODO 1. how robust is this? if there are no constraints or emissions will this throw an error?
-  # 2. Should the user be able to define where these files are saved to or should they save
-  # to emissions and constraint sub directories like they were hector repository?
-  # Split up the emissions and concentrations by scenario and save output.
-  emiss_files <-  lapply(split(emiss_data, emiss_data$scenario),
-                         function(x){
-                           scn   <- unique(x[['scenario']])
-                           fname <- file.path(output_dir, paste0('emission_', scn, '.csv'))
-                           save_hector_table(x, fname)
-                           fname})
+  # Save the the tables in the proper Hector table format. 
+  split(hector_inputs, interaction(hector_inputs$emiss_conc, hector_inputs$scenario, drop = TRUE)) %>%  
+          purrr::map(.f = function(x){
+            
+            # Save the file name 
+            scn   <- unique(x[['scenario']])
+            id     <- unique(x[['emiss_conc']])
+            fname <- file.path(output_dir, paste0(id, '_', scn, '.csv'))
+            
+            # Format and save the output table. 
+            save_hector_table(x[ , list(scenario, year, variable, units, value)], fname)
+            return(fname)
 
-  const_files <- lapply(split(const_data, const_data$scenario),
-                        function(x){
-                          scn   <- unique(x[['scenario']])
-                          fname <- file.path(output_dir, paste0('constraint_', scn, '.csv'))
-                          save_hector_table(x, fname)
-                          fname})
+          }) %>%  
+    unlist(use.names = FALSE) -> 
+    files 
 
-  files <- c(unlist(emiss_files), unlist(const_files), use.names = FALSE)
   return(files)
 
 }
