@@ -4,12 +4,10 @@
 \name{template_ini}
 \alias{template_ini}
 \title{template_ini}
-\format{
-A vector
+\format{A vector
 \describe{ A character vector where each element in the vector contains a different
 line of hector ini file.
-}
-}
+}}
 \usage{
 template_ini
 }

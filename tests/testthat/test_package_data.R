@@ -13,6 +13,4 @@ test_that('template_ini', {
   
   testthat::expect_equal(length(hector_RCP45), length(template_ini))
   
-  
-  
 })
