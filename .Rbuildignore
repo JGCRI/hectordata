@@ -7,3 +7,4 @@
 
 ^\.github$
 ^planning$
+^\.github/workflows/R-CMD-check\.yaml$
