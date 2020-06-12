@@ -4,12 +4,17 @@
 #'
 #' @param scenario a string vector that defines the scenarios to process, the default is set to
 #' NULL and will process all of the CMIP6 phase specific scenarios.
+#' @param years a vector of the years to convert from rcmip to hector intpus 
 #' @return a data frame of Hector inputs
 #' @importFrom assertthat assert_that
 #' @importFrom data.table melt.data.table
+#' @importFrom magrittr %>% 
 #' @noRd
-convert_rcmipCMIP6_hector <- function(scenario = NULL){
+convert_rcmipCMIP6_hector <- function(scenario = NULL, years){
 
+  # Silence package checks 
+  scenarios <- Scenario <- Region <- hector_variable <- hector_unit <- NULL
+    
   # Make sure that strings are not read in as factors. 
   options(stringsAsFactors=FALSE)
   

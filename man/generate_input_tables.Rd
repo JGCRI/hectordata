@@ -10,8 +10,9 @@ generate_input_tables(scenarios, output_dir, years)
 \item{scenarios}{a character vector of scenario names.}
 
 \item{output_dir}{a character of the full path to the directory location for
-the user to write the generated csv files to.
-@param years a vector of the expected output years.}
+the user to write the generated csv files to.}
+
+\item{years}{a vector of the expected output years.}
 }
 \value{
 the location of the generated csv files.

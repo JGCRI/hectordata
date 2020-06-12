@@ -6,12 +6,16 @@
 #' @param scenarios a character vector of scenario names.
 #' @param output_dir a character of the full path to the directory location for
 #'  the user to write the generated csv files to.
-#'  @param years a vector of the expected output years. 
+#' @param years a vector of the expected output years. 
 #' @return the location of the generated csv files.
 #' @export
 #' @importFrom assertthat assert_that
+#' @importFrom magrittr %>% 
 generate_input_tables <- function(scenarios, output_dir, years){
 
+  # Silence package checks  
+  emiss_conc <- variable <- na.omit <- scenario <- value <- NULL
+  
   # Check to make sure that the output directory exstits.
   assert_that(dir.exists(output_dir))
   assert_that(is.numeric(years))
@@ -33,7 +37,7 @@ generate_input_tables <- function(scenarios, output_dir, years){
     # Convert the CMIP phase 6 specific scenarios, subset the rcmip CMIP6 scenarios
     # from the scenarios argument to convert. 
     to_process <- intersect(rcmipCMIP6_scenario, scenarios)
-    processed  <- convert_rcmipCMIP6_hector(to_process)
+    processed  <- convert_rcmipCMIP6_hector(to_process, years = years)
     hector_inputs <- rbind(hector_inputs, processed)
     
   } else {

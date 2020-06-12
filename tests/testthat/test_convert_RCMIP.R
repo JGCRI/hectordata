@@ -2,6 +2,8 @@
 
 context('convert functions')
 
+years <- 1975:2010
+
 test_that('convert_rcmipCMIP6_hector', {
   
   # Test specifc emission species, that have had conversion issues in the past.
@@ -20,7 +22,7 @@ test_that('convert_rcmipCMIP6_hector', {
 
   # RCMIP included inputs for the CMIP5 scenarios (the rcps) however Hector has these inputs 
   # set up from the IIASA database which therefore use the RCP45 scenario to test the RCMIP conversion.
-  rcp45_data <- convert_rcmipCMIP6_hector(scenario = 'rcp45')
+  rcp45_data <- convert_rcmipCMIP6_hector(scenario = 'rcp45', years = years)
 
   # Import original Hector inputs and format for easy comparison.
   original_rcp45 <- as.data.table(read.csv(system.file('input/emissions/RCP45_emissions.csv', package = 'hector'), skip = 3))
