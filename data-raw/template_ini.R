@@ -17,14 +17,20 @@ hector_temp <- gsub(pattern = 'emissions/RCP45_emissions.csv',
                        replacement = 'emissions/TEMPLATE_emissions.csv',  x = hector_RCP45)
 
 
-# After replacing the emissions inputs replace the CO2 concentration constraint csv files with the 
-# DEFAULT file. 
-hector_temp <- gsub(pattern = 'constraints/RCP45_co2ppm.csv', 
-                       replacement = 'constraints/TEMPLATE_constraint.csv', x = hector_temp)
 
-# Also update the RF constraint to the template tag. 
-hector_temp <- gsub(pattern = 'constraints/MAGICC_RF_4.5.csv', 
-                    replacement = 'constraints/TEMPLATE_constraint.csv', x = hector_temp)
+# Identify the constraint lines and then parse out the specific constraintn file patterns. 
+# The pattern will be used to extract the constraints with the template tag.
+constraint_lines <- hector_temp[grepl(pattern = "constraints/[a-zA-Z0-9-]", x = hector_temp)]
+constraint_patterns <- sapply(constraint_lines, function(x){
+  # Pull out the constraint file name, make sure to exclude any inline comments from the ini file.
+  file <- unlist(strsplit(x, split = "csv:"))[[2]] 
+  file <- unlist(strsplit(file, split = ".csv"))[[1]]
+  out <- paste0(file, '.csv')
+  return(out)
+}, USE.NAMES = FALSE)
+pattern <- paste0(constraint_patterns, collapse = "|")
+hector_temp <- gsub(pattern = pattern, 
+                       replacement = 'constraints/TEMPLATE_constraint.csv', x = hector_temp)
 
 
 # The default hector ini file will be puerly emission driven meaning that all of the 
@@ -49,7 +55,7 @@ if(!any(deactivated_constraints)){
   } 
 
 # Replace the remaining rcp45 tags with the template name. 
-hector_temp  <- gsub(pattern = 'rcp45', replacement = 'TEMPLATE', x = tolower(hector_temp))
+hector_temp  <- gsub(pattern = 'rcp45', replacement = 'TEMPLATE', x = hector_temp)
 template_ini <- hector_temp
 
 usethis::use_data(template_ini, overwrite = TRUE)

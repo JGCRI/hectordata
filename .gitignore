@@ -5,4 +5,7 @@
 ./hectordata.Rproj
 .DS_Store
 
+
 planning
+inst/doc
+

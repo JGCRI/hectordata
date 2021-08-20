@@ -1,34 +1,33 @@
-## License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
-
-
-#' Generate emission and concentration constraint input tables for Hector.
+#' Generate emission and concentration constraint csv input tables for Hector.
 #'
 #' @param scenarios a character vector of scenario names.
-#' @param output_dir a character of the full path to the directory location for
+#' @param write_to a character of the full path to the directory location for
 #'  the user to write the generated csv files to.
-#' @param years a vector of the expected output years. 
+#' @param years a vector of the expected output years, default is a sequence from 1750 to 2100. 
 #' @return the location of the generated csv files.
 #' @export
 #' @importFrom assertthat assert_that
 #' @importFrom magrittr %>% 
-generate_input_tables <- function(scenarios, output_dir, years){
-
+generate_inputs <- function(scenarios, write_to, years=1750:2100){
+  
   # Silence package checks  
   emiss_conc <- variable <- na.omit <- scenario <- value <- NULL
   
   # Check to make sure that the output directory exstits.
-  assert_that(dir.exists(output_dir))
+  assert_that(dir.exists(write_to))
   assert_that(is.numeric(years))
-
+  
   # Create an empty hector_inputs data table.
   hector_inputs <- data.table::data.table()
-
+  
   # A list of scenarios in each data source.
+  # TODO this section may expand as the ability to generate hector inputs from different sources expands. 
+  # (i.e. idealized scnearios, CMIP5 scenarios, GCAM outputs ect.)
   rcmipCMIP6_scenario <- c("ssp370", "ssp434", "ssp460", "ssp119", "ssp126", "ssp245", "ssp534-over", "ssp585")
-
+  
   # Assert that the scenarios to process are categorized scenarios.
   assert_that(any(scenarios %in% c(rcmipCMIP6_scenario)), msg = 'unrecognized scenarios')
-
+  
   # Convert Inputs ------------------------------------------------------------------
   # The scenario inputs are provided by different sources IIASA, RCMIP and so on. So 
   # each set of scenarios must be processed with different rules. This series of if else 
@@ -46,40 +45,19 @@ generate_input_tables <- function(scenarios, output_dir, years){
          See https://github.com/JGCRI/hectordata/issues/8')
     
   }
-
+  
   # Interpolate the data over the missing years. 
   hector_inputs <- complete_missing_years(hector_inputs, expected_years = years)
   
-  # Add identifier information about if a variable is an emission or a constraint. 
-  hector_inputs[ , emiss_conc := ifelse(grepl(pattern = 'emission', x = variable), 'emission', NA_character_)]
-  hector_inputs[ , emiss_conc := ifelse(grepl(pattern = 'constrain', x = variable), 'constraint', emiss_conc)]
-  hector_inputs <- na.omit(hector_inputs)
-  
-  
-  
-  # Format and Save ------------------------------------------------------------------
-  # Save the Hector input tables. 
-  # Set up the directory to save them.
-  input_dir <- file.path(output_dir, 'inputs')
-  dir.create(input_dir, showWarnings = FALSE)
-
-  # Save the the tables in the proper Hector table format. 
-  split(hector_inputs, interaction(hector_inputs$emiss_conc, hector_inputs$scenario, drop = TRUE)) %>%  
-          purrr::map(.f = function(x){
-            
-            # Save the file name 
-            scn   <- unique(x[['scenario']])
-            id     <- unique(x[['emiss_conc']])
-            fname <- file.path(output_dir, paste0(id, '_', scn, '.csv'))
-            
-            # Format and save the output table. 
-            save_hector_table(x[ , list(scenario, year, variable, units, value)], fname)
-            return(fname)
-
-          }) %>%  
-    unlist(use.names = FALSE) -> 
+  # Format and save the emissions and concentration constraints in the csv files 
+  # in the proper Hector table input file. 
+  split(hector_inputs, hector_inputs$scenario) %>%  
+    sapply(write_hector_csv, write_to = write_to, USE.NAMES = FALSE) -> 
     files 
 
-  return(files)
-
+  # Generate the ini files corresponding to the new csv files. 
+  inis <- make_new_ini(files)
+  
+  return(inis)
+  
 }

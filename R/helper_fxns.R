@@ -83,8 +83,7 @@ complete_missing_years <- function(data, expected_years = 1700:2500){
 #' @param x a data table containing the Hector input information
 #' @param filename character path for where to save the output. 
 #' @return path to the csv file formatted as a Hector input table.  
-#' @export
-save_hector_table <- function(x, filename){
+format_hector_input_table <- function(x, filename){
   
   # Undefined global functions or variables:
   variable <- value <- NULL
@@ -95,12 +94,6 @@ save_hector_table <- function(x, filename){
   assertthat::assert_that(length(setdiff(names(x), req_names)) == 0, msg = 'Extra column names.')
   scn_name <- unique(x$scenario)
   assert_that(length(scn_name) == 1)
-  
-  # Make sure that the data frame contains emissions or concentrations but not both. 
-  variable_names <- unique(x$variable)
-  emis <- any(grepl(pattern = 'emissions', x = x$variable))
-  conc <- any(grepl(pattern = 'constrain', x = x$variable))
-  assert_that(sum(emis, conc)  == 1, msg = 'input data should include either emissions or constrained data not both.')
   
   # Transform the data frame into the wide format that Hector expects. 
   input_data <- x[ , list(Date = year, variable, value)]
@@ -122,4 +115,34 @@ save_hector_table <- function(x, filename){
                         lines)
   writeLines(final_lines, filename)
   return(filename)
+}
+
+
+
+#' Save the hector csv files into the proper hector format 
+#'
+#' @param x a datatable emissions or concentration data for a single emissions data frame
+#' @param write_to str directory to write the hector csv output to 
+#' @return str file name 
+#' @importFrom assertthat assert_that
+write_hector_csv <- function(x, write_to){
+  # Format and save the emissions and concentration constraints in the csv files 
+  # in the proper Hector table input file. 
+  assert_that(dir.exists(write_to))
+  
+  # check inputs
+  dir <- file.path(write_to, 'hectordata_outputs', 'emissions')
+  dir.create(dir, showWarnings = FALSE, recursive = TRUE)
+  
+  expect_true(assert_that(has_name(x, c("scenario", "year", "variable", "units", "value"))))
+  
+  # Parse out the scenario name
+  scn   <- unique(x[['scenario']])
+  fname <- file.path(dir, paste0(scn, '_emiss-constraints.csv'))
+  
+  # Format and save the output table. 
+  format_hector_input_table(x[ , list(scenario, year, variable, units, value)], fname)
+  
+  return(fname)
+  
 }
