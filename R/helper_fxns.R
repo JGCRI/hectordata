@@ -146,7 +146,3 @@ write_hector_csv <- function(x, write_to){
   return(fname)
   
 }
-  
-
-
-

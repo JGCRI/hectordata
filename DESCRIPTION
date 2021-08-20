@@ -32,3 +32,5 @@ Suggests:
     knitr,
     rmarkdown
 VignetteBuilder: knitr
+    testthat (>= 2.3.2)
+
