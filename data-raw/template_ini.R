@@ -55,7 +55,7 @@ if(!any(deactivated_constraints)){
   } 
 
 # Replace the remaining rcp45 tags with the template name. 
-hector_temp  <- gsub(pattern = 'rcp45', replacement = 'TEMPLATE', x = tolower(hector_temp))
+hector_temp  <- gsub(pattern = 'rcp45', replacement = 'TEMPLATE', x = hector_temp)
 template_ini <- hector_temp
 
 usethis::use_data(template_ini, overwrite = TRUE)

@@ -1,5 +1,3 @@
-## License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
-
 context('helper unit functions')
 
 
@@ -42,7 +40,7 @@ test_that('complete_missing_years', {
 })
 
 
-test_that('save_hector_table', {
+test_that('csv table fxns', {
   
   # Quickly run hector to pull generate some emissions, 
   core <- hector::newcore(system.file('input/hector_rcp45.ini', package = 'hector'))
@@ -56,15 +54,15 @@ test_that('save_hector_table', {
   
   # Make sure that errors are thrown. 
   xx <- emissions[ , list(scenario, year)]
-  testthat::expect_error(save_hector_table(xx, filename = temp_file))
+  testthat::expect_error(format_hector_input_table(xx, filename = temp_file))
   
   xx <- emissions
   xx$fake <- 'a column of fake data'
-  testthat::expect_error(save_hector_table(xx, filename = temp_file), 'Extra column names.')
+  testthat::expect_error(format_hector_input_table(xx, filename = temp_file), 'Extra column names.')
   
   
   # Make sure that the emissions inputs can be converted.
-  save_hector_table(emissions, filename = temp_file)
+  format_hector_input_table(emissions, filename = temp_file)
   lines <- readLines(temp_file)
   
   testthat::expect_equal(lines[[1]], "; rcp45")
@@ -78,4 +76,17 @@ test_that('save_hector_table', {
   # Remove the temp file
   file.remove(temp_file)
   
+  # Check how the table is written out 
+  ofile <- write_hector_csv(emissions, tempdir())
+  expect_true(grepl(pattern = "hectordata_outputs", ofile))
+  expect_error(read.csv(ofile), "more columns than column names")
+  
+  dat <- read.csv(ofile, comment.char = ";")
+  expect_true(is.data.frame(dat))
+  
+  # Remove another file 
+  file.remove(ofile)
+  
 })
+
+

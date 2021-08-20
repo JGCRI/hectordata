@@ -4,7 +4,8 @@
 \name{rcmipCMIP6_conversion}
 \alias{rcmipCMIP6_conversion}
 \title{rcmipCMIP6_conversion}
-\format{A data.table of 7 columns and 99 rows.
+\format{
+A data.table of 7 columns and 99 rows.
 \describe{ A character vector where each element in the vector contains a different
 \item{hector_component}{String character of the Hector component of the hector_variable.}
 \item{hector_variable}{String character variable name in the Hector format.}
@@ -13,7 +14,8 @@
 \item{rcmip_variable}{String character variable name in the RCMIP format.}
 \item{rcmip_units}{String character of the units of the RCMIP variable.}
 \item{rcmip_udunits}{String character of the units of the RCMIP variable that can be used by \code{ud_convert2}.}
-}}
+}
+}
 \usage{
 rcmipCMIP6_conversion
 }
