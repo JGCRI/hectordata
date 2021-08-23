@@ -54,6 +54,12 @@ generate_inputs <- function(scenarios, write_to, years=1750:2100){
   split(hector_inputs, hector_inputs$scenario) %>%  
     sapply(write_hector_csv, write_to = write_to, USE.NAMES = FALSE) -> 
     files 
+  
+  # Copy over the volcanic RF to create the full 
+  emissions_dir <- unique(dirname(files))
+  link <- "https://raw.githubusercontent.com/JGCRI/hector/master/inst/input/emissions/volcanic_RF.csv"
+  rf_data <- readLines(url(link))
+  writeLines(rf_data, file.path(emissions_dir, "volcanic_RF.csv"))
 
   # Generate the ini files corresponding to the new csv files. 
   inis <- make_new_ini(files)

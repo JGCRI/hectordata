@@ -23,7 +23,7 @@ test_that('rcp45', {
   # from the rcmip source. 
   comparison_data <- stats::na.omit(original_rcp45[rcp45_data, on = c('year', 'variable'), nomatch = NA])
   testthat::expect_equal(sum(is.na(comparison_data)), 0)
-  
+
   # The percent difference between the two RCP inputs should be small. 
   comparison_data[ , percent_change :=  100 * (value - value_original) / value_original]
   mean_difference   <- comparison_data[ year %in% 1850:2100, .(avg = mean(percent_change, na.rm = TRUE)), by = variable]
@@ -47,7 +47,8 @@ test_that('rcp45', {
   # If it can then check to see how the output compare with one another! 
   ini <- system.file("input/hector_rcp45.ini", package = "hector")
   core2 <- hector::newcore(ini)
-  old_rcp <- hector::fetchvars(core, dates = 1900:2100)
+  run(core2)
+  old_rcp <- hector::fetchvars(core2, dates = 1900:2100)
   old_rcp$run <- "old"
   hector::shutdown(core2)
   
@@ -55,6 +56,6 @@ test_that('rcp45', {
     data.table::dcast(year + variable ~ run) -> 
     long_comparison
  
-  tol <- 1e-3
+  tol <- 1e-2
   expect_true(all((long_comparison$old - long_comparison$rcmip) <= tol))
 })

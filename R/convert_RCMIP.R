@@ -20,20 +20,15 @@ convert_rcmipCMIP6_hector <- function(scenario = NULL, years = 1750:2100){
   if(is.null(scenario)){
     scenario <- c("ssp370", "ssp434", "ssp460", "ssp119", "ssp126", "ssp245", "ssp534-over", "ssp585")
   }
-
-  testing <- FALSE
-  if (testing){
-    # Download the Minted data from the zenodo repository, this is not working at the 
-    # moment will need to problem solve. 
-    link <- "https://zenodo.org/record/3779281/files/rcmip-emissions-annual-means-v4-0-0.csv?download=1"
-    emiss_data <- data.table::as.data.table(readr::read_csv(url(link)))
+  
+  # Download the Minted data from the zenodo repository, this is not working at the 
+  # moment will need to problem solve. 
+  link <- "https://zenodo.org/record/3779281/files/rcmip-emissions-annual-means-v4-0-0.csv?download=1"
+  emiss_data <- data.table::as.data.table(readr::read_csv(url(link)))
     
-    link <- "https://zenodo.org/record/3779281/files/rcmip-concentrations-annual-means-v4-0-0.csv?download=1"
-    conc_data <- data.table::as.data.table(readr::read_csv(url(link)))
-  } else {
-    load('/Users/dorh012/Documents/2020/hectordata/data-raw/emiss_data.rds')
-    load('/Users/dorh012/Documents/2020/hectordata/data-raw/conc_data.rds')
-  }
+  link <- "https://zenodo.org/record/3779281/files/rcmip-concentrations-annual-means-v4-0-0.csv?download=1"
+  conc_data <- data.table::as.data.table(readr::read_csv(url(link)))
+
 
   # Check inputs 
   assert_that(is.integer(years))
@@ -79,23 +74,6 @@ convert_rcmipCMIP6_hector <- function(scenario = NULL, years = 1750:2100){
   converted_cmip6 <- input_conversion_table[, list(Scenario, year, hector_variable, hector_unit)]
   names(converted_cmip6) <- c('scenario', 'year', 'variable', 'units')
   converted_cmip6[['value']] <- new_values
-  
-  # TODO need to check if correct thing to do, it is what we did in RCMIP 
-  for (scn in unique(converted_cmip6$scenario)){
-      missing1 <- data.table(year = unique(converted_cmip6$year), 
-                            variable = "HFC245fa_emissions", 
-                            scenario = scn, 
-                            value = 0, 
-                            units = "kt/yr")
-      missing2 <- data.table(year = unique(converted_cmip6$year), 
-                             variable = "NMVOC_emissions", 
-                             scenario = scn, 
-                             value = 0, 
-                             units = "Mt/yr")
-
-      missing <- rbind(missing2, missing1)
-      converted_cmip6 <- rbind(converted_cmip6, missing)
-  }
   
   return(converted_cmip6)
 }

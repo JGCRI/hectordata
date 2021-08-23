@@ -13,7 +13,7 @@ CH4,CH4_emissions, Tg CH4 year-1, Tg year-1,Emissions|CH4, Mt CH4 year-1, Mt yea
 CH4, CH4_constrain, ppb, ppb,Atmospheric Concentrations|CH4, ppb, ppb
 OH|ozone,NOX_emissions, Tg N year-1, 1/14.007 Tg year-1,Emissions|NOx, Mt NOx year-1, Mt 1/46.007 year-1
 OH|ozone,CO_emissions, Tg CO year-1, Tg year-1,Emissions|CO, Mt CO year-1, Mt year-1
-OH|ozone,NMVOC_emissions, Tg NMVOC year-1, Tg year-1, Emissions|VOC, Mt VOC year-1, Mt year-1
+OH|ozone,NMVOC_emissions, Tg NMVOC year-1, Tg year-1,Emissions|VOC, Mt VOC year-1, Mt year-1
 N2O,N2O_emissions, Tg N year-1, 44.014/28.014 Tg year-1,Emissions|N2O, kt N2O year-1, 1000 t year-1
 N2O,N2O_constrain, ppb, ppb,Atmospheric Concentrations|N2O, ppb, ppb
 BC,BC_emissions, Tg year-1, Tg year-1,Emissions|BC, Mt BC year-1, Mt year-1
@@ -47,7 +47,7 @@ HFC134a_halocarbon,HFC134a_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC134a, pp
 HFC143a_halocarbon,HFC143a_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC143a, ppt, ppt
 HFC227ea_halocarbon,HFC227ea_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC227ea, ppt, ppt
 HFC23_halocarbon,HFC23_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC23, ppt, ppt
-HFC245_halocarbon,HFC245_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC245fa, ppt, ppt
+HFC245fa_halocarbon,HFC245fa_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC245fa, ppt, ppt
 HFC32_halocarbon,HFC32_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC32, ppt, ppt
 HFC365_halocarbon,HFC365_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC365mfc, ppt, ppt
 HFC4310_halocarbon,HFC4310_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC4310mee, ppt, ppt
