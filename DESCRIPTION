@@ -29,8 +29,5 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 2.3.2),
-    knitr,
     rmarkdown
-VignetteBuilder: knitr
-    testthat (>= 2.3.2)
 

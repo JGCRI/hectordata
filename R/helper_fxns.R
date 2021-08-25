@@ -126,6 +126,10 @@ format_hector_input_table <- function(x, filename){
 #' @return str file name 
 #' @importFrom assertthat assert_that
 write_hector_csv <- function(x, write_to){
+  
+  # Silence package  checks 
+  scenario <-  variable <- value <- NULL
+  
   # Format and save the emissions and concentration constraints in the csv files 
   # in the proper Hector table input file. 
   assert_that(dir.exists(write_to))
@@ -134,7 +138,7 @@ write_hector_csv <- function(x, write_to){
   dir <- file.path(write_to, 'hectordata_outputs', 'emissions')
   dir.create(dir, showWarnings = FALSE, recursive = TRUE)
   
-  expect_true(assert_that(has_name(x, c("scenario", "year", "variable", "units", "value"))))
+ assert_that(assertthat::has_name(x, c("scenario", "year", "variable", "units", "value")))
   
   # Parse out the scenario name
   scn   <- unique(x[['scenario']])

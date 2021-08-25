@@ -7,11 +7,13 @@
 #' @noRd 
 identify_csv_inputs <- function(){
   
+  ini <- hectordata::template_ini
+  
   # Which lines of ini use csv files to read in inputs?
   csv_input_index <- which(grepl(pattern = "=csv:.*.csv", x = template_ini))
   
   # Isolate the variable name defined in the ini file.
-  names <- sapply(template_ini[csv_input_index], function(x){
+  names <- sapply(ini[csv_input_index], function(x){
     y <- strsplit(x, split = '=csv:')[[1]][1]
     y <- gsub(pattern = ';| ', replacement = '', x = y)
     return(y)
@@ -37,6 +39,9 @@ identify_csv_inputs <- function(){
 #' @return the lines of the modified ini file.  
 #' @export
 deactivate_input_variables <- function(lines, vars){
+  
+  # Silence package checks 
+  variable_name <- NULL 
   
   # Make sure that lines. 
   assertthat::assert_that(is.character(lines))
@@ -94,7 +99,7 @@ activate_input_variables <- function(lines, vars){
 #' @param ini lines of a Hector ini file. 
 #' @param replacement_path the file path to the hector input csv table. 
 #' @param run_name character name of run name. 
-#' @param pattern  regular expression pattern of the csv paths to replace with \object{replacement_path} 
+#' @param pattern  regular expression pattern of the csv paths to replace with `replacement_path`
 #' the default is set to replace all emission and concentration constraints.
 #' @return lines of a Hector ini file.
 #' @export

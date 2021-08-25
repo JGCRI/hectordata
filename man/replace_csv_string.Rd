@@ -18,7 +18,7 @@ replace_csv_string(
 
 \item{run_name}{character name of run name.}
 
-\item{pattern}{regular expression pattern of the csv paths to replace with \object{replacement_path}
+\item{pattern}{regular expression pattern of the csv paths to replace with \code{replacement_path}
 the default is set to replace all emission and concentration constraints.}
 }
 \value{

@@ -55,7 +55,7 @@ convert_rcmipCMIP6_hector <- function(scenario = NULL, years = 1750:2100){
   # Add the conversion data table information to the raw data with an inner join so that only variables that
   # have conversion information will be converted. The raw inputs include values for variables that Hector
   # does not have that are required by other classes of simple climate models.
-  conversion_table <- rcmipCMIP6_conversion
+  conversion_table <- hectordata::rcmipCMIP6_conversion
   input_conversion_table <- stats::na.omit(long_inputs[conversion_table, on = c('Variable' = 'rcmip_variable'), nomatch=NA])
 
   # Convert the value column from RCMIP units to Hector units.

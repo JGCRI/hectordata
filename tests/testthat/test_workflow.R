@@ -2,7 +2,7 @@ context('test full workflow')
 
 test_that('rcp45', {
   
-  # rcp45 is a test case fo
+  # rcp45 is a test case for
   # Create a temporary directory to store the csv & ini files in. 
   DIR <- tempdir()
   
@@ -10,6 +10,7 @@ test_that('rcp45', {
   # 
   # RCMIP included inputs for the CMIP5 scenarios (the rcps) however Hector has these inputs 
   # set up from the IIASA database which therefore use the RCP45 scenario to test the RCMIP conversion.
+  years <- 1750:2100
   rcp45_data <- convert_rcmipCMIP6_hector(scenario = 'rcp45', years = years)
   
   # Import original Hector inputs and format for easy comparison.
@@ -33,6 +34,13 @@ test_that('rcp45', {
   # Write the csv file out 
   file <- write_hector_csv(rcp45_data, write_to = DIR)
   
+  # Copy over the volcanic RF to create the full 
+  emissions_dir <- unique(dirname(file))
+  link <- url("https://raw.githubusercontent.com/JGCRI/hector/master/inst/input/emissions/volcanic_RF.csv")
+  rf_data <- readLines(link)
+  writeLines(rf_data, file.path(emissions_dir, "volcanic_RF.csv"))
+  close(link)
+  
   # Make the ini file
   ini <- make_new_ini(file)
   expect_true(file.exists(ini))
@@ -47,7 +55,7 @@ test_that('rcp45', {
   # If it can then check to see how the output compare with one another! 
   ini <- system.file("input/hector_rcp45.ini", package = "hector")
   core2 <- hector::newcore(ini)
-  run(core2)
+  hector::run(core2)
   old_rcp <- hector::fetchvars(core2, dates = 1900:2100)
   old_rcp$run <- "old"
   hector::shutdown(core2)

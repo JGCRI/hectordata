@@ -57,9 +57,10 @@ generate_inputs <- function(scenarios, write_to, years=1750:2100){
   
   # Copy over the volcanic RF to create the full 
   emissions_dir <- unique(dirname(files))
-  link <- "https://raw.githubusercontent.com/JGCRI/hector/master/inst/input/emissions/volcanic_RF.csv"
-  rf_data <- readLines(url(link))
+  link <- url("https://raw.githubusercontent.com/JGCRI/hector/master/inst/input/emissions/volcanic_RF.csv")
+  rf_data <- readLines(link)
   writeLines(rf_data, file.path(emissions_dir, "volcanic_RF.csv"))
+  close(link)
 
   # Generate the ini files corresponding to the new csv files. 
   inis <- make_new_ini(files)
