@@ -1,5 +1,3 @@
-## License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
-
 # Save the tables that will be used to convert emission and concentration time series 
 # to Hector inputs. 
 

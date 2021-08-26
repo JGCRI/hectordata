@@ -1,5 +1,3 @@
-## License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
-
 # This scripts creates a template ini file from a ini file from the Hector repository 
 # that can be used to generate other ini files. 
 

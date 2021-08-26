@@ -1,4 +1,3 @@
-## License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
 ## Function that help to modify the ini files.  
 
 #' Identify the variables and lines of hector ini file that use csvs to read in inputs. 

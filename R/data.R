@@ -1,5 +1,3 @@
-## License:  BSD 2-Clause, see LICENSE and DISCLAIMER files
-
 #' template_ini
 #'
 #' A character vector consisting of Hector inputs. 
