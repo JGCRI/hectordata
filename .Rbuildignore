@@ -5,5 +5,7 @@
 .Rprofile
 ^data-raw$
 ^README\.Rmd$
+^README_files$
+^README.md$
 ^\.github$
 
