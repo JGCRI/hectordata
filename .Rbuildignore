@@ -4,7 +4,6 @@
 ^LICENSE$
 .Rprofile
 ^data-raw$
-
+^README\.Rmd$
 ^\.github$
-^planning$
-^\.github/workflows/R-CMD-check\.yaml$
+

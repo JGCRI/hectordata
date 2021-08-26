@@ -30,4 +30,6 @@ RoxygenNote: 7.1.1
 Suggests: 
     testthat (>= 2.3.2),
     rmarkdown,
-    covr
+    covr,
+    knitr
+VignetteBuilder: knitr

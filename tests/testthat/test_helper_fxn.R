@@ -75,7 +75,7 @@ test_that('csv table fxns', {
   
   # Check how the table is written out 
   ofile <- write_hector_csv(emissions, tempdir())
-  expect_true(grepl(pattern = "hectordata_outputs", ofile))
+  expect_true(grepl(pattern = "input", ofile))
   expect_error(read.csv(ofile), "more columns than column names")
   
   dat <- read.csv(ofile, comment.char = ";")

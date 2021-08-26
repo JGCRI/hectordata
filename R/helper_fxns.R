@@ -135,7 +135,7 @@ write_hector_csv <- function(x, write_to){
   assert_that(dir.exists(write_to))
   
   # check inputs
-  dir <- file.path(write_to, 'hectordata_outputs', 'emissions')
+  dir <- file.path(write_to, 'input', 'emissions')
   dir.create(dir, showWarnings = FALSE, recursive = TRUE)
   
  assert_that(assertthat::has_name(x, c("scenario", "year", "variable", "units", "value")))
