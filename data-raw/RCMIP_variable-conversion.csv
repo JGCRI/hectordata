@@ -10,13 +10,14 @@ so2,SO2_emissions, Gg S year-1, Gg 1/32.1 year-1,Emissions|Sulfur, Mt SO2 year-1
 so2,SV, W m-2, W m-2,Radiative Forcing|Natural|Volcanic, W m-2, W m-2
 so2,SV, W m-2, W m-2,Effective Radiative Forcing|Natural|Volcanic, W m-2, W m-2
 CH4,CH4_emissions, Tg CH4 year-1, Tg year-1,Emissions|CH4, Mt CH4 year-1, Mt year-1
-CH4, CH4_constrain, ppb, ppb,Atmospheric Concentrations|CH4, ppb, ppb
+CH4,CH4_constrain, ppb, ppb,Atmospheric Concentrations|CH4, ppb, ppb
 OH|ozone,NOX_emissions, Tg N year-1, 1/14.007 Tg year-1,Emissions|NOx, Mt NOx year-1, Mt 1/46.007 year-1
 OH|ozone,CO_emissions, Tg CO year-1, Tg year-1,Emissions|CO, Mt CO year-1, Mt year-1
 OH|ozone,NMVOC_emissions, Tg NMVOC year-1, Tg year-1,Emissions|VOC, Mt VOC year-1, Mt year-1
 N2O,N2O_emissions, Tg N year-1, 44.014/28.014 Tg year-1,Emissions|N2O, kt N2O year-1, 1000 t year-1
 N2O,N2O_constrain, ppb, ppb,Atmospheric Concentrations|N2O, ppb, ppb
 BC,BC_emissions, Tg year-1, Tg year-1,Emissions|BC, Mt BC year-1, Mt year-1
+NH3,NH3_emissions, Tg year-1, Tg year-1,Emissions|NH3,Mt NH3/yr, Mt year-1
 OC,OC_emissions, Tg year-1, Tg year-1,Emissions|OC, Mt OC year-1, Mt year-1
 HFC125_halocarbon,HFC125_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC125, ppt, ppt
 HFC134a_halocarbon,HFC134a_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC134a, ppt, ppt
@@ -39,7 +40,7 @@ CFC12_halocarbon,CFC12_constrain, ppt, ppt,Atmospheric Concentrations|Montreal G
 CH3Br_halocarbon,CH3Br_constrain, ppt, ppt,Atmospheric Concentrations|Montreal Gases|CH3Br, ppt, ppt
 CH3CCl3_halocarbon,CH3CCl3_constrain, ppt, ppt, Atmospheric Concentrations|Montreal Gases|CH3CCl3, ppt, ppt
 CH3Cl_halocarbon,CH3Cl_constrain, ppt, ppt,Atmospheric Concentrations|Montreal Gases|CH3Cl, ppt, ppt
-halon1211_halocarbon, halon1211_concentration, ppt, ppt,Atmospheric Concentrations|Montreal Gases|Halon1211, ppt, ppt
+halon1211_halocarbon,halon1211_concentration, ppt, ppt,Atmospheric Concentrations|Montreal Gases|Halon1211, ppt, ppt
 halon1301_halocarbon,halon1301_concentration, ppt, ppt,Atmospheric Concentrations|Montreal Gases|Halon1301, ppt, ppt
 halon2402_halocarbon,halon2402_concentration, ppt, ppt,Atmospheric Concentrations|Montreal Gases|Halon2402, ppt, ppt
 HFC125_halocarbon,HFC125_emissions, ppt, ppt,Emissions|F-Gases|HFC|HFC125, ppt, ppt

@@ -33,3 +33,5 @@ Suggests:
     covr,
     knitr
 VignetteBuilder: knitr
+URL: https://github.com/JGCRI/hectordata
+BugReports: https://github.com/JGCRI/hectordata/issues
