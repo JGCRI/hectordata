@@ -53,6 +53,7 @@ get_molmass <- function(s) {
 #' @param expected_years the number of years to ensure there data, default set to 1700 to 2500
 #' @return a data table with interpolated data
 #' @importFrom zoo na.approx
+#' @import data.table 
 complete_missing_years <- function(data, expected_years = 1700:2500){
   
   # Undefined global functions or variables
@@ -98,7 +99,12 @@ format_hector_input_table <- function(x, filename){
   # Transform the data frame into the wide format that Hector expects. 
   input_data <- x[ , list(Date = year, variable, value)]
   input_data <- data.table::dcast(input_data, Date ~ variable, value.var = 'value') 
-  
+
+  daccs_vals <- ifelse(input_data[["ffi_emissions"]] < 0, -1 * input_data[["ffi_emissions"]], 0)
+  ffi_vals <- ifelse(input_data[["ffi_emissions"]] < 0, 0, input_data[["ffi_emissions"]])
+  input_data$ffi_emissions <- ffi_vals
+  input_data$daccs_uptake <- daccs_vals
+
   # Save the output as csv, latter on it will be read in as a character to make 
   # is possible to add the header information required by Hector. 
   readr::write_csv(input_data, filename, append = FALSE, col_names = TRUE)
