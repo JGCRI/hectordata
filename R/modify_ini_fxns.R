@@ -103,7 +103,7 @@ activate_input_variables <- function(lines, vars){
 #' @return lines of a Hector ini file.
 #' @export
 #' @importFrom assertthat assert_that
-replace_csv_string <- function(ini, replacement_path, run_name, pattern = "=csv:.*TEMPLATE_emissions.csv"){
+replace_csv_string <- function(ini, replacement_path, run_name, pattern = "=csv:.*TEMPLATE.csv"){
 
   # Make sure the pattern exists. 
   assert_that(any(grepl(pattern = pattern, x = ini)))
@@ -129,7 +129,7 @@ make_new_ini <- function(files){
     
     name <- unlist(strsplit(x = basename(f), split = "_"))[1]
 
-    new_path <- file.path('emissions', basename(f))
+    new_path <- file.path('tables', basename(f))
     new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = name)
     
     write_to <- dirname(dirname(f))

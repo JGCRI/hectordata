@@ -98,13 +98,8 @@ format_hector_input_table <- function(x, filename){
   
   # Transform the data frame into the wide format that Hector expects. 
   input_data <- x[ , list(Date = year, variable, value)]
-  input_data <- data.table::dcast(input_data, Date ~ variable, value.var = 'value') 
-
-  daccs_vals <- ifelse(input_data[["ffi_emissions"]] < 0, -1 * input_data[["ffi_emissions"]], 0)
-  ffi_vals <- ifelse(input_data[["ffi_emissions"]] < 0, 0, input_data[["ffi_emissions"]])
-  input_data$ffi_emissions <- ffi_vals
-  input_data$daccs_uptake <- daccs_vals
-
+  input_data <- dcast(input_data, Date ~ variable) 
+  
   # Save the output as csv, latter on it will be read in as a character to make 
   # is possible to add the header information required by Hector. 
   readr::write_csv(input_data, filename, append = FALSE, col_names = TRUE)
@@ -114,9 +109,11 @@ format_hector_input_table <- function(x, filename){
   var_units <- unique(x[ , list(variable, units)])
   units_list <- paste(c('; UNITS:', var_units$units), collapse = ', ')
   
+  
   # Add the header information. 
+  create_info <-  c(paste0('; created by hectordata ', date(), " commit ", system("git rev-parse HEAD", intern=TRUE)))
   final_lines <- append(c(paste0('; ', scn_name),
-                          '; created by hectordata',
+                          create_info,
                           units_list),
                         lines)
   writeLines(final_lines, filename)
@@ -141,18 +138,49 @@ write_hector_csv <- function(x, write_to){
   assert_that(dir.exists(write_to))
   
   # check inputs
-  dir <- file.path(write_to, 'input', 'emissions')
+  dir <- file.path(write_to, 'input', 'tables')
   dir.create(dir, showWarnings = FALSE, recursive = TRUE)
   
  assert_that(assertthat::has_name(x, c("scenario", "year", "variable", "units", "value")))
   
   # Parse out the scenario name
   scn   <- unique(x[['scenario']])
-  fname <- file.path(dir, paste0(scn, '_emiss-constraints.csv'))
+  fname <- file.path(dir, paste0(scn, '_emiss-constraints_rf.csv'))
   
   # Format and save the output table. 
   format_hector_input_table(x[ , list(scenario, year, variable, units, value)], fname)
   
   return(fname)
   
+}
+
+
+#' Formate the carbon cycle emissions, they must be postive values 
+#'
+#' @param input_data a data table emissions & concentration data 
+#' @return emissions and concentrations data frame with the correctly formatted carbon cycle emissions aka no negative emissions
+#' @importFrom assertthat assert_that
+process_carbon_cycle_emissions <- function(dat){
+  
+  # Check to make sure that the inpout had the correct names & variables. 
+  assert_that(has_name(x = dat, which = c("year", "variable","units", "value", "scenario")))
+  assert_that(all(c("ffi_emissions", "luc_emissions") %in% unique(dat[['variable']])))
+  
+  # Subset the input data to the two sources of carbon emissions.
+  carbon_emissions <- unique(dat[dat[ , variable %in% c("ffi_emissions", "luc_emissions")]])
+  wide_data <- dcast(carbon_emissions,  year + scenario + units ~ variable)
+    
+  # Format the fossil fuel emissions and land use change emissions so that the values 
+  # are postivie, if the emissions are negative read them in as dacccs or land uptake. 
+  wide_data[, daccs_uptake := ifelse(ffi_emissions <= 0, -1 * ffi_emissions, 0)]
+  wide_data[, ffi_emissions := ifelse(ffi_emissions >= 0, ffi_emissions, 0)]
+  wide_data[, luc_uptake := ifelse(luc_emissions <= 0, -1 * luc_emissions, 0)]
+  wide_data[, luc_emissions := ifelse(luc_emissions >= 0, luc_emissions, 0)]
+
+  # Add the new carbon emissions to the emissions data frame and return output. 
+  melt(wide_data, id.vars = c("scenario", "year", "units"))  %>% 
+    rbind(dat[dat[ , !variable %in% c("ffi_emissions", "luc_emissions")]]) -> 
+    out
+  
+  return(out)
 }

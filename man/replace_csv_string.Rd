@@ -8,7 +8,7 @@ replace_csv_string(
   ini,
   replacement_path,
   run_name,
-  pattern = "=csv:.*TEMPLATE_emissions.csv"
+  pattern = "=csv:.*TEMPLATE.csv"
 )
 }
 \arguments{

@@ -39,10 +39,11 @@ test_that('complete_missing_years', {
 
 test_that('csv table fxns', {
   
-  # Quickly run hector to pull generate some emissions, 
+  # Quickly run hector to pull generate some emissions, this test is sensitve 
+  # to the version of R. 
   core <- hector::newcore(system.file('input/hector_rcp45.ini', package = 'hector'))
   hector::run(core)
-  emission_vars <- c(hector::EMISSIONS_BC(), hector::EMISSIONS_CO())
+  emission_vars <- c(hector::EMISSIONS_BC(), hector::EMISSIONS_CO(), hector::FFI_EMISSIONS())
   emissions <- hector::fetchvars(core, vars = emission_vars, dates = 1900:2100, scenario = 'rcp45' )
   emissions <- data.table::as.data.table(emissions)
   
@@ -63,7 +64,7 @@ test_that('csv table fxns', {
   lines <- readLines(temp_file)
   
   testthat::expect_equal(lines[[1]], "; rcp45")
-  testthat::expect_equal(lines[[2]], "; created by hectordata")
+  testthat::expect_true(grepl(pattern = "; created by hectordata", x = lines[[2]]))
   testthat::expect_true(grepl(x = lines[[3]], pattern = "; UNITS"))
   
   data <- read.csv(temp_file, comment.char = ';')
