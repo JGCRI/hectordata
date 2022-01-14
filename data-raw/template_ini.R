@@ -1,6 +1,6 @@
 # This scripts creates the template ini package data. 
 
-# The the hector ini files defines a number of paramter values that can be adjusted via ini 
+# The the hector ini files defines a number of parameter values that can be adjusted via ini 
 # file or via the R hector interface. 
 ini_lines <- readLines(file.path('data-raw', 'hector_TEMPLATE.ini'))
 

@@ -113,7 +113,9 @@ format_hector_input_table <- function(x, filename){
   # Add the header information. 
   create_info <-  c(paste0('; created by hectordata ', date(), " commit ", system("git rev-parse HEAD", intern=TRUE)))
   final_lines <- append(c(paste0('; ', scn_name),
-                          create_info,
+                          paste0('; hectordata ', utils::packageVersion(pkg = 'hectordata')),
+                          paste0("; commit ", system("git rev-parse HEAD", intern=TRUE)), 
+                          paste0("; date ", date()), 
                           units_list),
                         lines)
   writeLines(final_lines, filename)
@@ -126,9 +128,10 @@ format_hector_input_table <- function(x, filename){
 #'
 #' @param x a datatable emissions or concentration data for a single emissions data frame
 #' @param write_to str directory to write the hector csv output to 
+#' @param source string name indicating the source part of the module name
 #' @return str file name 
 #' @importFrom assertthat assert_that
-write_hector_csv <- function(x, write_to){
+write_hector_csv <- function(x, write_to, source){
   
   # Silence package  checks 
   scenario <-  variable <- value <- NULL
@@ -136,16 +139,11 @@ write_hector_csv <- function(x, write_to){
   # Format and save the emissions and concentration constraints in the csv files 
   # in the proper Hector table input file. 
   assert_that(dir.exists(write_to))
-  
-  # check inputs
-  dir <- file.path(write_to, 'input', 'tables')
-  dir.create(dir, showWarnings = FALSE, recursive = TRUE)
-  
- assert_that(assertthat::has_name(x, c("scenario", "year", "variable", "units", "value")))
+  assert_that(assertthat::has_name(x, c("scenario", "year", "variable", "units", "value")))
   
   # Parse out the scenario name
   scn   <- unique(x[['scenario']])
-  fname <- file.path(dir, paste0(scn, '_emiss-constraints_rf.csv'))
+  fname <- file.path(write_to, paste0(source, '_', scn, '_emiss-constraints_rf.csv'))
   
   # Format and save the output table. 
   format_hector_input_table(x[ , list(scenario, year, variable, units, value)], fname)
@@ -163,7 +161,7 @@ write_hector_csv <- function(x, write_to){
 process_carbon_cycle_emissions <- function(dat){
   
   # Check to make sure that the inpout had the correct names & variables. 
-  assert_that(has_name(x = dat, which = c("year", "variable","units", "value", "scenario")))
+  assert_that(assertthat::has_name(x = dat, which = c("year", "variable","units", "value", "scenario")))
   assert_that(all(c("ffi_emissions", "luc_emissions") %in% unique(dat[['variable']])))
   
   # Subset the input data to the two sources of carbon emissions.
@@ -183,4 +181,34 @@ process_carbon_cycle_emissions <- function(dat){
     out
   
   return(out)
+}
+
+
+
+#' Read in hectordata data system inputs 
+#'
+#' @param files vector of the csv files names needed for the module 
+#' @return list of the data frame that will be used in the module 
+#' @importFrom assertthat assert_that
+load_data <- function(files){
+  
+  assert_that(is.vector(files))
+
+  out <- lapply(files, function(fname){
+    path <- list.files(path = INPUT_DIR, pattern = fname, full.names = TRUE)
+    if(length(path) == 0){
+      stop(fname, ' could not be found')
+    }
+    if(file.exists(path)){
+      d <-  data.table::as.data.table(read.csv(path, stringsAsFactors = FALSE))
+    } else {
+      message(cat(path, ' not found will need to download'))
+    }
+    return(d)
+    
+  })
+  
+  names(out) <- files
+  return(out)
+  
 }

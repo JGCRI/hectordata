@@ -127,13 +127,13 @@ make_new_ini <- function(files){
   
   lapply(files, function(f){
     
-    name <- unlist(strsplit(x = basename(f), split = "_"))[1]
+    name <- gsub(x = basename(f), pattern = "_emiss-constraints_rf.csv", replacement = "")
 
     new_path <- file.path('tables', basename(f))
     new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = name)
     
     write_to <- dirname(dirname(f))
-    ini_path <- file.path(write_to, paste0('hector_', name, '.ini'))
+    ini_path <- file.path(write_to, paste0(name, '.ini'))
     writeLines(new_ini, ini_path)
     
     return(ini_path)
