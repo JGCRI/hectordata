@@ -1,33 +1,33 @@
-#' Generate the ssp ini & csv files from the rcmip source
+#' Generate the rccp ini & csv files from the rcmip source
 #'
 #' @return str of the ini files 
 #' @export
 #' @importFrom assertthat assert_that
-module_rcmip_ssp <- function(){
-
+module_rcmip_rcp <- function(){
   ds_inputs <- c("rcmip-emissions-annual-means-v5-1-0.csv",
                  "rcmip-concentrations-annual-means-v5-1-0.csv",
                  "rcmip-radiative-forcing-annual-means-v5-1-0.csv")
-
-  # Load of the data files. 
+  
+  # Load of the data files.
   data <- load_data(ds_inputs)
   
-  # The scenarios that are being processed in this module. 
-  scenario <- c("ssp119", "ssp126", "ssp245", "ssp370", "ssp434", "ssp460", "ssp534-over", "ssp585")
-
+  # The scenarios that are being processed in this module.
+  scenario <- c("rcp26", "rcp45", "rcp60", "rcp85")
+  
   # Make sure data exists for the scenario(s) selected to process.
-  data_scns <- unique(c(data$`rcmip-emissions-annual-means-v5-1-0.csv`$Scenario, 
-                        data$`rcmip-concentrations-annual-means-v5-1-0.csv`$Scenario, 
+  data_scns <- unique(c(data$`rcmip-emissions-annual-means-v5-1-0.csv`$Scenario,
+                        data$`rcmip-concentrations-annual-means-v5-1-0.csv`$Scenario,
                         data$`rcmip-radiative-forcing-annual-means-v5-1-0.csv`$Scenario))
   available <- scenario %in% data_scns
   assert_that(all(available), msg = paste0('The following scenarios cannot be processed: ', paste(scenarios[!available], collapse = ', ')))
   
+  
   # Concatenate the long emissions and concentration data tables together and subset so that
   # only the scenarios of interest will be converted.
   raw_inputs <- rbind(data$`rcmip-emissions-annual-means-v5-1-0.csv`,
-                      data$`rcmip-concentrations-annual-means-v5-1-0.csv`, 
+                      data$`rcmip-concentrations-annual-means-v5-1-0.csv`,
                       data$`rcmip-radiative-forcing-annual-means-v5-1-0.csv`, fill = TRUE)[Scenario %in% scenario  & Region == "World"]
-
+  
   # Determine the columns that contain identifier information, such as the model, scenario, region, variable,
   # unit, etc. These columns will be used to transform the data from being wide to long so that each row
   # corresponds to concentration for a specific year.
@@ -58,12 +58,12 @@ module_rcmip_ssp <- function(){
   
   # Create the data table of the inputs that have the Hector relevant variable, units, and values by selecting
   # and renaming the columns from the input conversion table. Then add the converted values.
-  converted_cmip6 <- input_conversion_table[, list(Scenario, year, hector_variable, hector_unit)]
-  names(converted_cmip6) <- c('scenario', 'year', 'variable', 'units')
-  converted_cmip6[['value']] <- new_values
+  converted_rcps <- input_conversion_table[, list(Scenario, year, hector_variable, hector_unit)]
+  names(converted_rcps) <- c('scenario', 'year', 'variable', 'units')
+  converted_rcps[['value']] <- new_values
   
   # Interpolate the data over the missing years.
-  complete_data <- complete_missing_years(converted_cmip6, expected_years = YEARS)
+  complete_data <- complete_missing_years(converted_rcps, expected_years = YEARS)
   
   # Format hector inputs so that negative carbon emissions are properly
   # categorized into daccs and land uptake.
@@ -78,7 +78,5 @@ module_rcmip_ssp <- function(){
   # Generate the ini files corresponding to the new csv files.
   inis <- make_new_ini(files)
   return(inis)
-  
-
-    }
+}
 
