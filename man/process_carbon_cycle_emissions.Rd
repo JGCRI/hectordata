@@ -7,7 +7,7 @@
 process_carbon_cycle_emissions(dat)
 }
 \arguments{
-\item{input_data}{a data table emissions & concentration data}
+\item{dat}{a data table emissions & concentration data}
 }
 \value{
 emissions and concentrations data frame with the correctly formatted carbon cycle emissions aka no negative emissions

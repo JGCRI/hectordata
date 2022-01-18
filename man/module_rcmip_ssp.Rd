@@ -4,11 +4,12 @@
 \alias{module_rcmip_ssp}
 \title{Generate the ssp ini & csv files from the rcmip source}
 \usage{
-module_rcmip_ssp(...)
+module_rcmip_ssp()
 }
 \value{
 str of the ini files
 }
 \description{
-Generate the ssp ini & csv files from the rcmip source
+Creates ini and csv tables for the following scenarios based on the RCMIP protocols
+ssp119, ssp126, ssp245, ssp370, ssp434, ssp460, ssp534-over, ssp585
 }

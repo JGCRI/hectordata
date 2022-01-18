@@ -4,7 +4,7 @@
 \alias{write_hector_csv}
 \title{Save the hector csv files into the proper hector format}
 \usage{
-write_hector_csv(x, write_to, source)
+write_hector_csv(x, write_to, source, end_tag = "_emiss-constraints_rf")
 }
 \arguments{
 \item{x}{a datatable emissions or concentration data for a single emissions data frame}
@@ -12,6 +12,8 @@ write_hector_csv(x, write_to, source)
 \item{write_to}{str directory to write the hector csv output to}
 
 \item{source}{string name indicating the source part of the module name}
+
+\item{end_tag}{string used at the end of of the table, in most cases will be default name "_emiss-constraints_rf"}
 }
 \value{
 str file name
