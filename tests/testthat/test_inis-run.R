@@ -8,8 +8,7 @@ test_that('inis run', {
   lapply(ini_files, function(f){
     core <- hector::newcore(inifile = f)
     expect_equal(class(core)[1], "hcore")
-    run_msg <- capture.output(hector::run(core = core, runtodate = 2300)) 
+    run_msg <- capture.output(hector::run(core = core, runtodate = 2100)) 
     expect_equal(length(run_msg), 5)
-  
   })
 })

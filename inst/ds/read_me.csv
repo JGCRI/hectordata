@@ -1,0 +1,5 @@
+﻿; A description of the contents of the hectordata/inst/ds (the hector data system inputs),,
+File,Source,Description
+rcmip-concentrations-annual-means-v5-1-0.csv,https://www.rcmip.org/,"RCMIP concentrations, due to the size of data files not included in the hectordata package as internal data, it may need to be downloaded. "
+rcmip-emissions-annual-means-v5-1-0.csv,https://www.rcmip.org/,"RCMIP emissions, due to the size of data files not included in the hectordata package as internal data, it may need to be downloaded. "
+rcmip-radiative-forcing-annual-means-v5-1-0.csv,https://www.rcmip.org/,"RCMIP radiative forcing, due to the size of data files not included in the hectordata package as internal data, it may need to be downloaded. "

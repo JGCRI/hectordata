@@ -98,7 +98,7 @@ format_hector_input_table <- function(x, filename){
   
   # Transform the data frame into the wide format that Hector expects. 
   input_data <- x[ , list(Date = year, variable, value)]
-  input_data <- dcast(input_data, Date ~ variable) 
+  input_data <- dcast(input_data, Date ~ variable, fun.aggregate = mean) 
   
   # Save the output as csv, latter on it will be read in as a character to make 
   # is possible to add the header information required by Hector. 
@@ -129,9 +129,10 @@ format_hector_input_table <- function(x, filename){
 #' @param x a datatable emissions or concentration data for a single emissions data frame
 #' @param write_to str directory to write the hector csv output to 
 #' @param source string name indicating the source part of the module name
+#' @param end_tag string used at the end of of the table, in most cases will be default name "_emiss-constraints_rf"
 #' @return str file name 
 #' @importFrom assertthat assert_that
-write_hector_csv <- function(x, write_to, source){
+write_hector_csv <- function(x, write_to, source, end_tag = "_emiss-constraints_rf"){
   
   # Silence package  checks 
   scenario <-  variable <- value <- NULL
@@ -143,7 +144,7 @@ write_hector_csv <- function(x, write_to, source){
   
   # Parse out the scenario name
   scn   <- unique(x[['scenario']])
-  fname <- file.path(write_to, paste0(source, '_', scn, '_emiss-constraints_rf.csv'))
+  fname <- file.path(write_to, paste0(source, '_', scn, end_tag, '.csv'))
   
   # Format and save the output table. 
   format_hector_input_table(x[ , list(scenario, year, variable, units, value)], fname)
