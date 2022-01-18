@@ -1,9 +1,17 @@
 #' Generate the rccp ini & csv files from the rcmip source
+#' 
+#' Creates ini and csv tables for the following scenarios based on the RCMIP protocols 
+#' rcp26, rcp45, rcp60, rcp85
 #'
 #' @return str of the ini files 
 #' @export
 #' @importFrom assertthat assert_that
 module_rcmip_rcp <- function(){
+  
+  # Silence package checks
+  hector_unit <- hector_variable <- Region <- Scenario <- scenarios <- NULL
+  
+  
   ds_inputs <- c("rcmip-emissions-annual-means-v5-1-0.csv",
                  "rcmip-concentrations-annual-means-v5-1-0.csv",
                  "rcmip-radiative-forcing-annual-means-v5-1-0.csv")
@@ -48,13 +56,12 @@ module_rcmip_rcp <- function(){
   # Convert the value column from RCMIP units to Hector units.
   # This step may take a while depending on the number of scenarios being
   # processed.
-  mapply(ud_convert2,
-         x = input_conversion_table$value,
-         from = input_conversion_table$rcmip_udunits,
-         to = input_conversion_table$hector_udunits,
-         SIMPLIFY = FALSE) %>%
-    unlist ->
-    new_values
+  new_values <-  unlist(mapply(ud_convert2,
+                               x = input_conversion_table$value,
+                               from = input_conversion_table$rcmip_udunits,
+                               to = input_conversion_table$hector_udunits,
+                               SIMPLIFY = FALSE))
+  
   
   # Create the data table of the inputs that have the Hector relevant variable, units, and values by selecting
   # and renaming the columns from the input conversion table. Then add the converted values.
@@ -71,8 +78,7 @@ module_rcmip_rcp <- function(){
   
   # Format and save the emissions and concentration constraints in the csv files
   # in the proper Hector table input file.
-  split(final_data, final_data$scenario) %>%
-    sapply(write_hector_csv, write_to = TABLES_DIR, USE.NAMES = FALSE, source = "rcmip") ->
+  sapply(X = split(final_data, final_data$scenario), FUN = write_hector_csv, write_to = TABLES_DIR, USE.NAMES = FALSE, source = "rcmip") ->
     files
   
   # Generate the ini files corresponding to the new csv files.

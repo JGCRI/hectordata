@@ -9,7 +9,7 @@ identify_csv_inputs <- function(){
   ini <- hectordata::template_ini
   
   # Which lines of ini use csv files to read in inputs?
-  csv_input_index <- which(grepl(pattern = "=csv:.*.csv", x = template_ini))
+  csv_input_index <- which(grepl(pattern = "=csv:.*.csv", x = ini))
   
   # Isolate the variable name defined in the ini file.
   names <- sapply(ini[csv_input_index], function(x){
@@ -73,6 +73,9 @@ deactivate_input_variables <- function(lines, vars){
 #' @export
 activate_input_variables <- function(lines, vars){
   
+  # Silence package checks 
+  variable_name <- NULL
+  
   # Make sure that lines. 
   assertthat::assert_that(is.character(lines))
   
@@ -123,9 +126,12 @@ replace_csv_string <- function(ini, replacement_path, run_name, pattern = "=csv:
 #' @importFrom assertthat assert_that
 make_new_ini <- function(files){
   
+  # Silence global variables 
+  template_ini <- NULL
+  
   assert_that(all(file.exists(files)))
   
-  lapply(files, function(f){
+  out <- unlist(lapply(files, function(f){
     
     name <- gsub(x = basename(f), pattern = "_emiss-constraints_rf.csv", replacement = "")
 
@@ -137,9 +143,7 @@ make_new_ini <- function(files){
     writeLines(new_ini, ini_path)
     
     return(ini_path)
-  }) %>% 
-    unlist -> 
-    out
+  }))
   
   return(out)
 }

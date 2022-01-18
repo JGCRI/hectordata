@@ -1,20 +1,26 @@
 #' Generate the ssp ini & csv files from the rcmip source
+#' 
+#' Creates ini and csv tables for the following scenarios based on the RCMIP protocols 
+#' ssp119, ssp126, ssp245, ssp370, ssp434, ssp460, ssp534-over, ssp585
 #'
 #' @return str of the ini files 
 #' @export
 #' @importFrom assertthat assert_that
 module_rcmip_ssp <- function(){
-
+  
+  # Silence package checks
+  scenarios <- Scenario <- Region <- hector_variable <- hector_unit <- NULL
+  
   ds_inputs <- c("rcmip-emissions-annual-means-v5-1-0.csv",
                  "rcmip-concentrations-annual-means-v5-1-0.csv",
                  "rcmip-radiative-forcing-annual-means-v5-1-0.csv")
-
+  
   # Load of the data files. 
   data <- load_data(ds_inputs)
   
   # The scenarios that are being processed in this module. 
   scenario <- c("ssp119", "ssp126", "ssp245", "ssp370", "ssp434", "ssp460", "ssp534-over", "ssp585")
-
+  
   # Make sure data exists for the scenario(s) selected to process.
   data_scns <- unique(c(data$`rcmip-emissions-annual-means-v5-1-0.csv`$Scenario, 
                         data$`rcmip-concentrations-annual-means-v5-1-0.csv`$Scenario, 
@@ -27,7 +33,7 @@ module_rcmip_ssp <- function(){
   raw_inputs <- rbind(data$`rcmip-emissions-annual-means-v5-1-0.csv`,
                       data$`rcmip-concentrations-annual-means-v5-1-0.csv`, 
                       data$`rcmip-radiative-forcing-annual-means-v5-1-0.csv`, fill = TRUE)[Scenario %in% scenario  & Region == "World"]
-
+  
   # Determine the columns that contain identifier information, such as the model, scenario, region, variable,
   # unit, etc. These columns will be used to transform the data from being wide to long so that each row
   # corresponds to concentration for a specific year.
@@ -48,13 +54,11 @@ module_rcmip_ssp <- function(){
   # Convert the value column from RCMIP units to Hector units.
   # This step may take a while depending on the number of scenarios being
   # processed.
-  mapply(ud_convert2,
+  new_values <- unlist(mapply(ud_convert2,
          x = input_conversion_table$value,
          from = input_conversion_table$rcmip_udunits,
          to = input_conversion_table$hector_udunits,
-         SIMPLIFY = FALSE) %>%
-    unlist ->
-    new_values
+         SIMPLIFY = FALSE))
   
   # Create the data table of the inputs that have the Hector relevant variable, units, and values by selecting
   # and renaming the columns from the input conversion table. Then add the converted values.
@@ -71,14 +75,13 @@ module_rcmip_ssp <- function(){
   
   # Format and save the emissions and concentration constraints in the csv files
   # in the proper Hector table input file.
-  split(final_data, final_data$scenario) %>%
-    sapply(write_hector_csv, write_to = TABLES_DIR, USE.NAMES = FALSE, source = "rcmip") ->
+  sapply(X = split(final_data, final_data$scenario), FUN = write_hector_csv, write_to = TABLES_DIR, USE.NAMES = FALSE, source = "rcmip") ->
     files
   
   # Generate the ini files corresponding to the new csv files.
   inis <- make_new_ini(files)
   return(inis)
   
-
-    }
+  
+}
 

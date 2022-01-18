@@ -60,7 +60,7 @@ complete_missing_years <- function(data, expected_years = 1700:2500){
   scenario <- variable <- value <- NULL
   
   assertthat::assert_that(assertthat::has_name(x = data, which = c('scenario', 'variable', 'units', 'year')))
-
+  
   # Make a data table of the required years we want for each variable. This data table will 
   # be used to  add NA values to the data table containing the inputs. 
   data_no_years <- unique(data[ , list(scenario, variable, units)])
@@ -156,10 +156,13 @@ write_hector_csv <- function(x, write_to, source, end_tag = "_emiss-constraints_
 
 #' Formate the carbon cycle emissions, they must be postive values 
 #'
-#' @param input_data a data table emissions & concentration data 
+#' @param dat a data table emissions & concentration data 
 #' @return emissions and concentrations data frame with the correctly formatted carbon cycle emissions aka no negative emissions
 #' @importFrom assertthat assert_that
 process_carbon_cycle_emissions <- function(dat){
+  
+  # Silence global variables 
+  variable <- daccs_uptake <- ffi_emissions <- luc_uptake <- luc_emissions <- NULL
   
   # Check to make sure that the inpout had the correct names & variables. 
   assert_that(assertthat::has_name(x = dat, which = c("year", "variable","units", "value", "scenario")))
@@ -168,17 +171,17 @@ process_carbon_cycle_emissions <- function(dat){
   # Subset the input data to the two sources of carbon emissions.
   carbon_emissions <- unique(dat[dat[ , variable %in% c("ffi_emissions", "luc_emissions")]])
   wide_data <- dcast(carbon_emissions,  year + scenario + units ~ variable)
-    
+  
   # Format the fossil fuel emissions and land use change emissions so that the values 
   # are postivie, if the emissions are negative read them in as dacccs or land uptake. 
   wide_data[, daccs_uptake := ifelse(ffi_emissions <= 0, -1 * ffi_emissions, 0)]
   wide_data[, ffi_emissions := ifelse(ffi_emissions >= 0, ffi_emissions, 0)]
   wide_data[, luc_uptake := ifelse(luc_emissions <= 0, -1 * luc_emissions, 0)]
   wide_data[, luc_emissions := ifelse(luc_emissions >= 0, luc_emissions, 0)]
-
+  
   # Add the new carbon emissions to the emissions data frame and return output. 
-  melt(wide_data, id.vars = c("scenario", "year", "units"))  %>% 
-    rbind(dat[dat[ , !variable %in% c("ffi_emissions", "luc_emissions")]]) -> 
+  rbind(melt(wide_data, id.vars = c("scenario", "year", "units")) , 
+        dat[dat[ , !variable %in% c("ffi_emissions", "luc_emissions")]]) -> 
     out
   
   return(out)
@@ -194,14 +197,14 @@ process_carbon_cycle_emissions <- function(dat){
 load_data <- function(files){
   
   assert_that(is.vector(files))
-
+  
   out <- lapply(files, function(fname){
     path <- list.files(path = INPUT_DIR, pattern = fname, full.names = TRUE)
     if(length(path) == 0){
       stop(fname, ' could not be found')
     }
     if(file.exists(path)){
-      d <-  data.table::as.data.table(read.csv(path, stringsAsFactors = FALSE))
+      d <-  data.table::as.data.table(utils::read.csv(path, stringsAsFactors = FALSE))
     } else {
       message(cat(path, ' not found will need to download'))
     }

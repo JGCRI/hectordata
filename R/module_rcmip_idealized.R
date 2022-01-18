@@ -1,24 +1,47 @@
 #' Generate the idealized ini & csv files from the rcmip source
+#' 
+#' Creates ini and csv tables for the following scenarios based on the RCMIP protocols 
+#' 1pctCO2, 1pctCO2-4xext, abrupt-0p5xCO2, abrupt-2xCO2, piControl, abrupt-4xCO2, 1pctCO2-cdr
 #'
-#' @return str of the ini files 
+#' @return str of the ini files
 #' @export
 #' @importFrom assertthat assert_that
 module_rcmip_idealized <- function(){
   
-  # Load of the data files.
-  data <- load_data("rcmip-concentrations-annual-means-v5-1-0.csv")
+  # Silence package checks 
+  template_ini <- value <- variable <- hector_unit <- hector_variable <- ..cols <- Region <- 
+    scenarios <- ..yr_cols <- Variable <- Scenario <- NULL
   
-  # The scenarios that are being processed in this module.
-  scenario <- c("1pctCO2", "1pctCO2-4xext", "abrupt-0p5xCO2", "abrupt-2xCO2", "piControl", "abrupt-4xCO2")
+  # Load of the data files.
+  data <- load_data(c("rcmip-concentrations-annual-means-v5-1-0.csv", 
+                      # The 1% CO2 CDR scenario was included in older versions of the RCMIP protocol, 
+                      # use the CO2 concentrations from one of these runs to complete a Hector csv table 
+                      # for this run. 
+                      "rcmip_phase-1_fair-1.5-default-1pctCO2-cdr_v1-0-0.csv"))
+  
+  # Make a data frame of a full scenario, this scenario will be populated with the values for 
+  # atmospheric CO2 concentrations from the 1pct CO2 cdr run. 
+  cdr_df <- as.data.frame(data$`rcmip-concentrations-annual-means-v5-1-0.csv`[Scenario == "1pctCO2"])
+  cdr_df$Scenario <- "1pctCO2-cdr"
+  cols_to_keep <- names(cdr_df)
+  
+  cdr_co2_vals <- data$`rcmip_phase-1_fair-1.5-default-1pctCO2-cdr_v1-0-0.csv`[Variable == "Atmospheric Concentrations|CO2",]
+  yr_cols <- names(cdr_co2_vals)[grepl(pattern = "X", x = names(cdr_co2_vals))]
+  vals <- cdr_co2_vals[Variable == "Atmospheric Concentrations|CO2", ..yr_cols]
+  cdr_df[(cdr_df$Variable == "Atmospheric Concentrations|CO2" & cdr_df$Region == "World"), names(cdr_df) %in% yr_cols] <- vals
+  
+  
+  # The scenarios that are being processed in this module 
+  scenario <- c("1pctCO2", "1pctCO2-4xext", "abrupt-0p5xCO2", "abrupt-2xCO2", "piControl", "abrupt-4xCO2", "1pctCO2-cdr")
   
   # Make sure data exists for the scenario(s) selected to process.
-  data_scns <- unique(data$`rcmip-concentrations-annual-means-v5-1-0.csv`$Scenario)
+  data_scns <- unique(c(data$`rcmip-concentrations-annual-means-v5-1-0.csv`$Scenario, cdr_df$Scenario))
   available <- scenario %in% data_scns
   assert_that(all(available), msg = paste0('The following scenarios cannot be processed: ', paste(scenarios[!available], collapse = ', ')))
   
   # Concatenate the long emissions and concentration data tables together and subset so that
   # only the scenarios of interest will be converted.
-  raw_inputs <- rbind(data$`rcmip-concentrations-annual-means-v5-1-0.csv`, fill = TRUE)[Scenario %in% scenario  & Region == "World"]
+  raw_inputs <- rbind(data$`rcmip-concentrations-annual-means-v5-1-0.csv`, cdr_df, fill = TRUE)[Scenario %in% scenario  & Region == "World"]
   
   # The idealized runs are only driven with CO2 concentrations, add the emission species that
   vars_to_add <- data.table::data.table(rcmip_variable = c("Emissions|CO2|Fossil and Industrial", "Emissions|CO2|AFOLU",
@@ -92,12 +115,11 @@ module_rcmip_idealized <- function(){
   # Convert the value column from RCMIP units to Hector units.
   # This step may take a while depending on the number of scenarios being
   # processed.
-  mapply(ud_convert2,
+  unlist(mapply(ud_convert2,
          x = input_conversion_table$value,
          from = input_conversion_table$rcmip_udunits,
          to = input_conversion_table$hector_udunits,
-         SIMPLIFY = FALSE) %>%
-    unlist ->
+         SIMPLIFY = FALSE)) -> 
     new_values
   
   # Create the data table of the inputs that have the Hector relevant variable, units, and values by selecting
@@ -114,15 +136,13 @@ module_rcmip_idealized <- function(){
   final_data <- process_carbon_cycle_emissions(complete_data)
   
   # From 1745 to 1850 set the values to the pre industrial concentration value. 
-
   abrupt_scns <- unique(final_data$scenario)[grepl(pattern = "abrupt",  x =  unique(final_data$scenario))]
   final_data <- final_data[scenario %in% abrupt_scns & year %in% 1745:1850 & variable == "CO2_constrain", value := 284.317]
   
   
   # Format and save the emissions and concentration constraints in the csv files
   # in the proper Hector table input file.
-  split(final_data, final_data$scenario) %>%
-    sapply(write_hector_csv, write_to = TABLES_DIR, source = "rcmip", USE.NAMES = TRUE) ->
+  sapply(X = split(final_data, final_data$scenario) , FUN = write_hector_csv, write_to = TABLES_DIR, source = "rcmip", USE.NAMES = TRUE) ->
     files
   
   
