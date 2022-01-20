@@ -137,7 +137,7 @@ module_rcmip_idealized <- function(){
   
   # From 1745 to 1850 set the values to the pre industrial concentration value. 
   abrupt_scns <- unique(final_data$scenario)[grepl(pattern = "abrupt",  x =  unique(final_data$scenario))]
-  final_data <- final_data[scenario %in% abrupt_scns & year %in% 1745:1850 & variable == "CO2_constrain", value := 284.317]
+  final_data <- final_data[scenario %in% abrupt_scns & year %in% 1745:1849 & variable == "CO2_constrain", value := 284.317]
   
   
   # Format and save the emissions and concentration constraints in the csv files
@@ -145,27 +145,32 @@ module_rcmip_idealized <- function(){
   sapply(X = split(final_data, final_data$scenario) , FUN = write_hector_csv, write_to = TABLES_DIR, source = "rcmip", USE.NAMES = TRUE) ->
     files
   
-  
-  make_idealized_inis <- function(f){
-    
-    name <- gsub(x = basename(f), pattern = "_emiss-constraints_rf.csv", replacement = "")
-    
-    new_path <- file.path('tables', basename(f))
-    new_ini  <- replace_csv_string(template_ini, replacement_path = new_path, run_name = name)
-    updated_ini_lines <-activate_input_variables(new_ini, vars = c("CO2_constrain", "CH4_constrain", "N2O_constrain"))
-    
-    write_to <- dirname(dirname(f))
-    ini_path <- file.path(write_to, paste0(name, '.ini'))
-    writeLines(updated_ini_lines, ini_path)
-    
-    return(ini_path)
-    
-  }
-  
   out <- unlist(lapply(X = files, FUN = make_idealized_inis))
   
   return(out)
   
+  
+}
+
+
+#' Custom internal function that makes the ini files for \code{module_rcmip_idealized}
+#' 
+#' @param string path to the csv table files 
+#' @return str of the ini files
+#' @noRd
+make_idealized_inis <- function(f){
+  
+  name <- gsub(x = basename(f), pattern = "_emiss-constraints_rf.csv", replacement = "")
+  
+  new_path <- file.path('tables', basename(f))
+  new_ini  <- replace_csv_string(template_ini, replacement_path = new_path, run_name = name)
+  updated_ini_lines <- activate_input_variables(new_ini, vars = c("CO2_constrain", "CH4_constrain", "N2O_constrain"))
+  
+  write_to <- dirname(dirname(f))
+  ini_path <- file.path(write_to, paste0(name, '.ini'))
+  writeLines(updated_ini_lines, ini_path)
+  
+  return(ini_path)
   
 }
 
