@@ -2,7 +2,7 @@
 devtools::load_all()
 
 # Create the directory to write the output to. 
-DIR <- here::here("inst")
+DIR <- here::here("inst", "input", "tables")
 dir.create(DIR, recursive = TRUE, showWarnings = FALSE)
 
 # Run the various modules to generate the hector input tables. 
