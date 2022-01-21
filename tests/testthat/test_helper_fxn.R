@@ -39,11 +39,12 @@ test_that('complete_missing_years', {
 
 test_that('csv table fxns', {
   
-  # Quickly run hector to pull generate some emissions, 
-  core <- hector::newcore(system.file('input/hector_rcp45.ini', package = 'hector'))
+  # Quickly run hector to pull generate some emissions, this test is sensitive 
+  # to the version of Hector is being used. 
+  core <- hector::newcore(system.file('input/hector_ssp245.ini', package = 'hector'))
   hector::run(core)
-  emission_vars <- c(hector::EMISSIONS_BC(), hector::EMISSIONS_CO())
-  emissions <- hector::fetchvars(core, vars = emission_vars, dates = 1900:2100, scenario = 'rcp45' )
+  emission_vars <- c(hector::EMISSIONS_BC(), hector::EMISSIONS_CO(), hector::FFI_EMISSIONS())
+  emissions <- hector::fetchvars(core, vars = emission_vars, dates = 1900:2100, scenario = 'ssp245')
   emissions <- data.table::as.data.table(emissions)
   
   # Save the output files
@@ -62,9 +63,12 @@ test_that('csv table fxns', {
   format_hector_input_table(emissions, filename = temp_file)
   lines <- readLines(temp_file)
   
-  testthat::expect_equal(lines[[1]], "; rcp45")
-  testthat::expect_equal(lines[[2]], "; created by hectordata")
-  testthat::expect_true(grepl(x = lines[[3]], pattern = "; UNITS"))
+  testthat::expect_equal(lines[[1]], "; ssp245")
+  testthat::expect_true(grepl(pattern = "; hectordata ", x = lines[[2]]))
+  testthat::expect_true(grepl(x = lines[[3]], pattern = "; commit"))
+  testthat::expect_true(grepl(x = lines[[4]], pattern = "; date"))
+  testthat::expect_true(grepl(x = lines[[5]], pattern = "; UNITS"))
+  
   
   data <- read.csv(temp_file, comment.char = ';')
   testthat::expect_true(all(names(data) %in% c("Date", emission_vars)))
@@ -74,8 +78,8 @@ test_that('csv table fxns', {
   file.remove(temp_file)
   
   # Check how the table is written out 
-  ofile <- write_hector_csv(emissions, tempdir())
-  expect_true(grepl(pattern = "input", ofile))
+  ofile <- write_hector_csv(x = emissions, write_to = tempdir(), source = "rcmip")
+  expect_true(grepl(pattern = "emiss-constraints_rf", ofile))
   expect_error(read.csv(ofile), "more columns than column names")
   
   dat <- read.csv(ofile, comment.char = ";")
@@ -83,6 +87,20 @@ test_that('csv table fxns', {
   
   # Remove another file 
   file.remove(ofile)
+  
+})
+
+
+test_that('load_data', {
+  
+  # Make sure that data is being loaded correctly 
+  exsiting_file <- list.files(INPUT_DIR, pattern = "csv")[1]
+  out <- load_data(exsiting_file)
+  expect_equal(length(out), length(exsiting_file))
+  expect_true(is.list(out[1]))
+  
+  test <- "fake.csv"
+  expect_error(load_data(test), regexp = "fake.csv could not be found")
   
 })
 

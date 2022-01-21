@@ -35,9 +35,9 @@ list.files(hectordata_dir, pattern = ".ini")
 Let's run hector for the ssp119, ssp460, and ssp585 scenarios. Start by defining the path to the ini files. 
 
 ```{r}
-ini_ssp119 <- system.file("input/hector_ssp119.ini", package = "hectordata")
-ini_ssp460 <- system.file("input/hector_ssp460.ini", package = "hectordata")
-ini_ssp585 <- system.file("input/hector_ssp585.ini", package = "hectordata")
+ini_ssp119 <- system.file("input/rcmip_ssp119.ini", package = "hectordata")
+ini_ssp460 <- system.file("input/rcmip_ssp460.ini", package = "hectordata")
+ini_ssp585 <- system.file("input/rcmip_ssp585.ini", package = "hectordata")
 ```
 
 

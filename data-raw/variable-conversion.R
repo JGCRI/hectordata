@@ -1,8 +1,8 @@
 # Save the tables that will be used to convert emission and concentration time series 
 # to Hector inputs. 
 
-# For the CMIP6 inputs we use the conversion table created by the RCMIP project see 
-# https://github.com/ashiklom/hector-rcmip/tree/master/inst for more details. 
+# For the SSP inputs we use the conversion table originally created for the RCMIP project see 
+# https://github.com/ashiklom/hector-rcmip/tree/master/inst, modified for Hector v3. 
 path <- here::here('data-raw', 'RCMIP_variable-conversion.csv') 
 rcmipCMIP6_conversion <- read.csv(path, stringsAsFactors = FALSE)
 

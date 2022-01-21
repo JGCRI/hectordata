@@ -4,7 +4,7 @@
 .Ruserdata
 ./hectordata.Rproj
 .DS_Store
-
+.Rproj
 
 planning
 inst/doc

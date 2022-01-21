@@ -31,6 +31,9 @@ This example assumes that `hectordata`, [`hector`](https://github.com/jgcri/hect
 library(hector)
 library(hectordata)
 library(ggplot2)
+
+# Define the ggplot theme.
+theme_set(theme_bw())
 ```
 
 
