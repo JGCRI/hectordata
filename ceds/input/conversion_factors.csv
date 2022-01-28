@@ -1,0 +1,11 @@
+﻿em,hector_unit,CEDS_unit,conversion_ceds_to_hector
+CH4,Tg [CH4],kt [CH4],0.001
+BC,Tg [C],kt [C],0.001
+CO,Tg [CO],kt [CO],0.001
+CO2,Pg [C],kt [CO2],0.000000273
+N2O,Tg [N],kt [N2O],0.000637
+NH3,Tg [NH3],kt [NH3],0.001
+NMVOC,Tg [NMVOC],kt [NMVOC],0.001
+NOx,Tg [N],kt [NOx],0.000467
+OC,Tg [OC],kt [OC],0.001
+SO2,Gg [S],kt [SO2],0.50078

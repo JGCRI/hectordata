@@ -5,7 +5,8 @@ Authors@R: c(person("Kalyn", "Dorheim", email = "kalyn.dorheim@pnnl.gov", role =
     person("Matt", "Nicholson", email = "matthew.nicholson@pnnl.gov", role = c("ctb")), 
     person("Ben", "Bond-Lamberty", email = "BondLamberty@pnnl.gov", role = c("ctb")),
     person("Chris", "Vernon", email = "chris.vernon@pnnl.gov", role = c("ctb")),
-    person(given = "Alexey", family = "Shiklomanov", role = c("ctb"), email = "alexey.shiklomanov@gmail.com"))
+    person(given = "Alexey", family = "Shiklomanov", role = c("ctb"), email = "alexey.shiklomanov@gmail.com"),
+    person("Harrison", "Suchyta", email = "harrison.suchyta@pnnl.gov", role = c("ctb")))
 Description: This pacakge prepares, documents, and formats the inputs for Hector. 
 Depends: R (>= 2.10)
 Imports:
@@ -16,9 +17,7 @@ Imports:
     magrittr (>= 1.5),
     purrr (>= 0.3.3),
     readr (>= 1.3.1), 
-    hector (>= 2.5.0), 
     biogas (>= 1.23.2)
-
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
