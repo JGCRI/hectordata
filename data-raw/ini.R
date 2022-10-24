@@ -1,9 +1,5 @@
-# This scripts creates the template ini package data. 
-
-# The the hector ini files defines a number of parameter values that can be adjusted via ini 
-# file or via the R hector interface. 
+# Save a copy of the template ini file as internal package data. 
 ini_lines <- readLines(file.path('data-raw', 'hector_TEMPLATE.ini'))
-
 
 # Identify and deactivate all constraint lines 
 constriant_index <- which(grepl(pattern = "constrain=csv", x = ini_lines))
@@ -20,12 +16,10 @@ if(!any(deactivated_constraints)){
   
   for(i in ini_index){
     ini_lines[i] <- paste0(';',  ini_lines[i])
-      print(paste0(';',  ini_lines[i]))
+    print(paste0(';',  ini_lines[i]))
   }
   
-  } 
+} 
 
-# Replace the remaining rcp45 tags with the template name. 
-template_ini <- ini_lines
-
-usethis::use_data(template_ini, overwrite = TRUE)
+ini_template <- ini_lines
+usethis::use_data(ini_template, overwrite = TRUE)
