@@ -4,15 +4,16 @@
 #' 
 #' @return a data table of the variables that use csv as inputs. 
 #' @noRd 
-identify_csv_inputs <- function(){
+identify_csv_inputs <- function(lines){
   
-  ini <- hectordata::template_ini
-  
+  # Make sure that lines. 
+  assertthat::assert_that(is.character(lines))
+    
   # Which lines of ini use csv files to read in inputs?
-  csv_input_index <- which(grepl(pattern = "=csv:.*.csv", x = ini))
+  csv_input_index <- which(grepl(pattern = "=csv:.*.csv", x = lines))
   
   # Isolate the variable name defined in the ini file.
-  names <- sapply(ini[csv_input_index], function(x){
+  names <- sapply(lines[csv_input_index], function(x){
     y <- strsplit(x, split = '=csv:')[[1]][1]
     y <- gsub(pattern = ';| ', replacement = '', x = y)
     return(y)
@@ -46,7 +47,7 @@ deactivate_input_variables <- function(lines, vars){
   assertthat::assert_that(is.character(lines))
   
   # Determine which inputs are using csv files from the ini file. 
-  dt <- identify_csv_inputs()
+  dt <- identify_csv_inputs(lines)
   
   # Make sure that the variables to deactivate are listed in the ini file.
   missing <- !vars %in% dt[['variable_name']]
@@ -80,7 +81,7 @@ activate_input_variables <- function(lines, vars){
   assertthat::assert_that(is.character(lines))
   
   # Determine which inputs are using csv files from the ini file. 
-  dt <- identify_csv_inputs()
+  dt <- identify_csv_inputs(lines)
   
   # Make sure that the variables to be activated that are listed in the ini file.
   missing <- !vars %in% dt[['variable_name']]
@@ -107,7 +108,7 @@ activate_input_variables <- function(lines, vars){
 #' @export
 #' @importFrom assertthat assert_that
 replace_csv_string <- function(ini, replacement_path, run_name, pattern = "=csv:.*TEMPLATE.csv"){
-
+  
   # Make sure the pattern exists. 
   assert_that(any(grepl(pattern = pattern, x = ini)))
   
@@ -127,14 +128,12 @@ replace_csv_string <- function(ini, replacement_path, run_name, pattern = "=csv:
 make_new_ini <- function(files){
   
   # Silence global variables 
-  template_ini <- NULL
-  
   assert_that(all(file.exists(files)))
   
   out <- unlist(lapply(files, function(f){
     
     name <- gsub(x = basename(f), pattern = "_emiss-constraints_rf.csv", replacement = "")
-
+    
     new_path <- file.path('tables', basename(f))
     new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = name)
     
@@ -147,6 +146,4 @@ make_new_ini <- function(files){
   
   return(out)
 }
-
-
 

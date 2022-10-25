@@ -1,3 +1,5 @@
+library(data.table)
+
 # Save a list of conversion tables that will be used to convert emissions and concentrations 
 # to Hector inputs. 
 conversion_table <- list()
@@ -14,6 +16,13 @@ cols_to_modify <- which(names(rcmip) %in% c("Model", "Scenario", "Region", "Vari
 for(i in seq_along(cols_to_modify)){rcmip[[i]] <- trimws(rcmip[[i]], which = 'left')}
 conversion_table[["rcmip"]] <- rcmip
 
+
+# Mapping table for the v25 to v3 
+# ---------------------------------------------------------------------------------------------------
+# Mapping for the variable names 
+path <- here::here('data-raw', 'v25_variable-mapping.csv') 
+v25 <- as.data.table(read.csv(path, stringsAsFactors = FALSE))
+conversion_table[["v25"]] <- v25
 
 
 # ---------------------------------------------------------------------------------------------------

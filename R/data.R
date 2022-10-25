@@ -6,7 +6,7 @@
 #' \describe{ A character vector where each element vector contains a different 
 #' line of hector ini file. 
 #' }
-'ini_template'
+'template_ini'
 
 
 #' conversion_table

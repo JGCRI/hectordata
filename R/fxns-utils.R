@@ -7,7 +7,7 @@
 #' @import udunits2
 #' @return Values of `x` converted to `to` units.
 #' @author Alexey Shiklomanov
-#' @export
+#' @noRd
 ud_convert2 <- function(x, from, to) {
   udunits2::ud.convert(x, parse_chem(from), parse_chem(to))
 }
@@ -43,6 +43,7 @@ parse_chem <- function(unit) {
 #' @return a data table with interpolated data
 #' @importFrom zoo na.approx
 #' @import data.table 
+#' @noRd
 complete_missing_years <- function(data, expected_years = 1700:2500){
   
   # Undefined global functions or variables
@@ -68,16 +69,15 @@ complete_missing_years <- function(data, expected_years = 1700:2500){
   return(completed_data)
 }
 
-#' Formate the carbon cycle emissions, they must be postive values 
+#' Format the carbon cycle emissions, they must be positive values 
 #'
 #' @param dat a data table emissions & concentration data 
 #' @return emissions and concentrations data frame with the correctly formatted carbon cycle emissions aka no negative emissions
 #' @importFrom assertthat assert_that
+#' @import data.table
+#' @noRd
 process_carbon_cycle_emissions <- function(dat){
-  
-  # Silence global variables 
-  variable <- daccs_uptake <- ffi_emissions <- luc_uptake <- luc_emissions <- NULL
-  
+
   # Check to make sure that the inpout had the correct names & variables. 
   assertthat::assert_that(assertthat::has_name(x = dat, which = c("year", "variable","units", "value", "scenario")))
   assertthat::assert_that(all(c("ffi_emissions", "luc_emissions") %in% unique(dat[['variable']])))
@@ -101,5 +101,85 @@ process_carbon_cycle_emissions <- function(dat){
     out
   
   return(out)
+}
+
+
+#' Download the input data from zenodo 
+#'
+#' @param version str value corresponding to the version of the data on zenodo, default is set to 0.0.0.91
+#' @param write_to str directory location where to download the data to
+#' @return 
+#' @importFrom assertthat assert_that
+#' @noRd
+fetch_minted_data <- function(version = "0.0.0.91", write_to = ZENODO_DIR){
+  
+  URL_list <- c("0.0.0.9000" = "https://zenodo.org/record/7221866/files/data.zip?download=1", 
+                "0.0.0.91" = "https://zenodo.org/record/7249210/files/data.zip?download=1")
+  
+  assert_that(dir.exists(write_to))
+  assert_that(version %in% names(URL_list), msg = paste0(version, " not found"))
+  
+  url <- URL_list[names(URL_list) == version]
+  dest_file <- file.path(write_to, "data.zip")
+  
+  if(!file.exists(dest_file)){
+    download.file(url, dest_file)
+    unzip(zipfile = dest_file, exdir = write_to)
+  }
+  
+}
+
+
+#' Download the input data from zenodo 
+#'
+#' @param dir str value corresponding to where the minted input data is downloaded
+#' @param info_source str pattern of the source of the input data
+#' @return str directory location
+#' @noRd
+find_input_dir <- function(dir = ZENODO_DIR, info_source){
+  dirs <- list.dirs(dir, full.names = TRUE)
+  out <- dirs[grepl(pattern = info_source, x = dirs)]
+  out <- out[!grepl(pattern = "__", x = out)]
+  return(out)
+}
+
+
+#' Download the input data from zenodo 
+#'
+#' @param f str file path to the hector csv table to extract the information from a Hector csv file 
+#' @return data frame of the units and variables
+#' @noRd
+extract_header_info <- function(f){
+  
+  assert_that(file.exists(f))
+  
+  lines <- head(read.csv(f))
+  
+  assert_that(sum(grepl(x = lines[ ,1], pattern = ";")) > 1)
+  
+  units <- unlist(lines[2, ])
+  variables <- unlist(lines[3, ])
+  names(units) <- names(variables) <- NULL
+  
+  dat <- data.frame("units" = units, 
+                    "variable" = variables)
+  dat <- dat[!grepl(pattern = ";", x = dat$units), ]
+  return(dat)
+}
+
+
+#' Rename columns in a data frame
+#'
+#' @param dat data frame with the columns to be renamed
+#' @param cols str vector of the old column names and the new ones
+#' @return data frame of the units and variables
+#' @noRd
+rename <- function(dat, cols){
+  assert_that(all(cols %in% names(dat)))
+  for(x in seq_along(cols)){
+    index <- which(cols[x] == names(dat))
+    names(dat)[index] <- names(cols)[x]
+  }
+  return(dat)
 }
 
