@@ -7,14 +7,19 @@ process_rcmip_data <- function(scenarios_to_process){
   
   rcmip_dir <- find_input_dir(dir = ZENODO_DIR, "rcmip")
   assertthat::assert_that(dir.exists(rcmip_dir), msg = "must fetch mited data")
-
+  
   # Import the data files and subset to include only the data to process.
   files <- list.files(rcmip_dir, full.names = TRUE, pattern = "means")
-  all_data <- as.data.table(dplyr::bind_rows(lapply(files, read.csv)))
+  all_data <- as.data.table(do.call(lapply(files, read.csv), what = "rbind"))
   
   if(is.null(scenarios_to_process)){
-    scenarios_to_process <- c("rcp60", "ssp370", "ssp434", "ssp460", "rcp26", "ssp119", "ssp126", "rcp85", 
-                              "ssp245", "rcp45", "ssp534-over", "ssp585")  
+    scenarios_to_process <- c("rcp60", "ssp370",  "ssp370-lowNTCF-aerchemmip", 
+                              "ssp370-lowNTCF-gidden", "ssp434", "ssp460", 
+                              "rcp26", "ssp119", "ssp126", "rcp85",  "ssp245", "rcp45",                    
+                              "ssp534-over", "ssp585", "1pctCO2", "1pctCO2-4xext",            
+                              "abrupt-0p5xCO2", "abrupt-2xCO2", "abrupt-4xCO2", "historical",               
+                              "historical-cmip5", "piControl", "esm-bell-1000PgC", "esm-bell-2000PgC",         
+                              "esm-bell-750PgC", "esm-pi-CO2pulse","esm-pi-cdr-pulse", "esm-piControl")
   } else {
     available <- scenarios_to_process %in% unique(all_data$Scenario)
     assert_that(all(available), msg = paste0('The following scenarios cannot be processed: ', paste(scenarios_to_process[!available], collapse = ', ')))
@@ -93,7 +98,7 @@ generate_rcmip_ssps <- function(){
                               info_source = "rcmip", 
                               write_to = TABLES_DIR, 
                               end_tag = "_emiss-constraints_rf")
-   inis <- make_new_ini(ofile)
+    inis <- make_new_ini(ofile)
     
   }
   

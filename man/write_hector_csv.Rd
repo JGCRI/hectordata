@@ -21,7 +21,7 @@ write_hector_csv(
 
 \item{info_source}{string name indicating the source part of the module name}
 
-\item{file_tag}{string used at the end of of the table, in most cases will be default name "_emiss-constraints_rf"}
+\item{end_tag}{string used at the end of of the table file, in most cases will be default name "_emiss-constraints_rf"}
 }
 \value{
 str file name

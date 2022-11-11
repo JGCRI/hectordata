@@ -1,5 +1,4 @@
-#library(hector)
-devtools::load_all("~/projects/Hector-Versions/v3/hector")
+library(hector)
 test_that("inis run", {
   
   ini_files <- list.files(here::here("inst", "input"), pattern = ".ini", full.names = TRUE)

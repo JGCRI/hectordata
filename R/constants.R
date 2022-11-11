@@ -3,6 +3,7 @@ YEARS <- 1745:2300
 SCRATCH_DIR <- tempdir()
 TABLES_DIR <- here::here("inst", "input", "tables")
 ZENODO_DIR <- here::here("zenodo") # TODO there is a better way to handle this. 
+INTERMEDIATE_DIR <- here::here("intermediate") # TODO there has to be a better way to pass intermediate to downstream processes.
 
 # Vector of all the emissions that must be included a Hector input table. The constraints 
 # and other radiative forcing inputs may not be necessary it really depends run configuration.

@@ -4,7 +4,7 @@
 #' @param required str vector of the required variables that must be included in the table
 #' @param write_to str directory to write the hector csv output to 
 #' @param info_source string name indicating the source part of the module name
-#' @param file_tag string used at the end of of the table, in most cases will be default name "_emiss-constraints_rf"
+#' @param end_tag string used at the end of of the table file, in most cases will be default name "_emiss-constraints_rf"
 #' @return str file name 
 #' @import assertthat 
 write_hector_csv <- function(x, required, write_to, info_source, end_tag = "_emiss-constraints_rf"){
