@@ -42,11 +42,13 @@ generate_v25_rcps <- function(){
                                      replacement = "")
       complete_data$units <- ""
       
+      complete_data <- complete_missing_years(data = complete_data, expected_years = 1745:2500)
       ofile <- write_hector_csv(complete_data,
                                 required = c(REQUIRED_EMISSIONS, "SV"),
                                 write_to = TABLES_DIR,
                                 info_source = "v25",
                                 end_tag = "_emiss-rf")
+      
       
       
       name <- gsub(x = basename(ofile), pattern = "_emiss-rf.csv", replacement = "")

@@ -6,6 +6,7 @@
 process_rcmip_data <- function(scenarios_to_process){
   
   rcmip_dir <- find_input_dir(dir = ZENODO_DIR, "rcmip")
+  assertthat::assert_that(dir.exists(rcmip_dir), msg = "must fetch mited data")
 
   # Import the data files and subset to include only the data to process.
   files <- list.files(rcmip_dir, full.names = TRUE, pattern = "means")
@@ -51,12 +52,27 @@ process_rcmip_data <- function(scenarios_to_process){
   names(converted_cmip6) <- c('scenario', 'year', 'variable', 'units')
   converted_cmip6[['value']] <- new_values
   
+  # Parse out the natural + solar RF and the BC on snow RF. These values may be used in scenarios 
+  # depending on the set up 
+  extra_rfs_to_add <- c("Radiative Forcing|Anthropogenic|Other|BC on Snow", 
+                        "Radiative Forcing|Natural", 
+                        "Effective Radiative Forcing|Natural|Solar", 
+                        "Effective Radiative Forcing|Anthropogenic|Other|BC on Snow" )
+  rf_data_to_add <- na.omit(long_inputs[long_inputs$Variable %in% extra_rfs_to_add, ])
+  rf_data_to_add$Variable <- ifelse(grepl(x = rf_data_to_add$Variable, pattern = "Anthropogenic|Other|BC on Snow"), 
+                                    "RF_BConSnow", 
+                                    "RF_Natural")
+  rf_data_to_add <- rf_data_to_add[,list(scenario = Scenario, variable = Variable, units = Unit, year, value)]
+  rf_misc_data <- rf_data_to_add[, list(value = sum(value)), by = list(scenario, units, year)]
+  rf_misc_data$variable <- "RF_misc"
+  rf_data <- rbind(rf_misc_data, rf_data_to_add, fill = TRUE)
+  
   # Interpolate the data over the missing years.
-  complete_data <- complete_missing_years(converted_cmip6, expected_years = YEARS)
+  complete_data <- complete_missing_years(rbind(converted_cmip6, rf_data), expected_years = YEARS)
   
   # Format hector inputs so that negative carbon emissions are properly
   # categorized into daccs and land uptake.
-  final_data <- process_carbon_cycle_emissions(complete_data)
+  final_data <- process_carbon_cycle_emissions(complrf_dataete_data)
   
   return(final_data)
   
@@ -102,8 +118,3 @@ generate_rcmip_rcps <- function(){
   }
   
 }
-
-
-
-
-

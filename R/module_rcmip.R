@@ -3,11 +3,13 @@
 #' @param scenarios_to_process string vector of the scenario names to process
 #' @import data.table
 #' @return data frame of Hector inputs for multiple scenarios 
-process_rcmip_data <- function(scenarios_to_process){
+process_rcmip_data <- function(scenarios_to_process=NULL){
   
   rcmip_dir <- find_input_dir(dir = ZENODO_DIR, "rcmip")
+  assertthat::assert_that(dir.exists(rcmip_dir), msg = "data dir not found")
 
-  # Import the data files and subset to include only the data to process.
+  # Import the concentrations, emissions, and radiative forcing 
+  # files and subset to include only the data to process.
   files <- list.files(rcmip_dir, full.names = TRUE, pattern = "means")
   all_data <- as.data.table(dplyr::bind_rows(lapply(files, read.csv)))
   
@@ -51,8 +53,21 @@ process_rcmip_data <- function(scenarios_to_process){
   names(converted_cmip6) <- c('scenario', 'year', 'variable', 'units')
   converted_cmip6[['value']] <- new_values
   
+  # Add in the additional RF values & BC on snow, these will be entries in the table output 
+  # table for clarity purpose, these two values will contribute to RF_misc. 
+  RF_to_add <- c("Effective Radiative Forcing|Natural", 
+                 "Effective Radiative Forcing|Anthropogenic|Other|BC on Snow")
+  additional_RF <- na.omit(long_inputs[long_inputs$Variable %in% RF_to_add, ])
+  additional_RF$Variable <- ifelse(additional_RF$Variable == "Effective Radiative Forcing|Natural", 
+                                   "RF_natural", "RF_BConSnow")
+  RF_misc <- additional_RF[, list(value = sum(value)), by = list(Model, Scenario, Region, Unit, Activity_Id, Mip_Era, year)]
+  RF_misc$Variable <- "RF_misc"
+  data_to_add <- rbind(RF_misc, additional_RF)
+  data_to_add <- data_to_add[ , list(scenario = Scenario, units = Unit, 
+                                     variable = Variable, year, value)]
+  
   # Interpolate the data over the missing years.
-  complete_data <- complete_missing_years(converted_cmip6, expected_years = YEARS)
+  complete_data <- complete_missing_years(rbind(converted_cmip6, data_to_add), expected_years = YEARS)
   
   # Format hector inputs so that negative carbon emissions are properly
   # categorized into daccs and land uptake.
@@ -78,7 +93,8 @@ generate_rcmip_ssps <- function(){
   data_list <- split(data, data$scenario)
   for(dat in data_list){
     ofile <- write_hector_csv(dat, 
-                              required = c(REQUIRED_EMISSIONS, REQUIRED_RF), 
+                              required = c(REQUIRED_EMISSIONS, REQUIRED_RF, "RF_BConSnow", 
+                                           "RF_misc", "RF_natural"), 
                               info_source = "rcmip", 
                               write_to = TABLES_DIR, 
                               end_tag = "_emiss-constraints_rf")
@@ -112,8 +128,4 @@ generate_rcmip_rcps <- function(){
   }
   
 }
-
-
-
-
 
