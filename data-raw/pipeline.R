@@ -7,4 +7,5 @@ devtools::load_all()
 fetch_minted_data()
 process_rcmip_data()
 
-generate_rcmip_submission_files(scenarios_to_process = "ssp119")
+generate_rcmip_submission_files()
+generate_v25_files()

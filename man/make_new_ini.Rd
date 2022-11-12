@@ -4,10 +4,12 @@
 \alias{make_new_ini}
 \title{Generate a new ini file for a given emissions file}
 \usage{
-make_new_ini(files)
+make_new_ini(files, iniprefix_ = NULL)
 }
 \arguments{
-\item{files}{str vector of the new csv hector input files.}
+\item{files}{str vector of the new csv hector input files}
+
+\item{iniprefix_}{optional string prefix to add the ini file name}
 }
 \value{
 str of the ini files

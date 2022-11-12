@@ -121,11 +121,12 @@ replace_csv_string <- function(ini, replacement_path, run_name, pattern = "=csv:
 
 #' Generate a new ini file for a given emissions file
 #'
-#' @param files str vector of the new csv hector input files.
+#' @param files str vector of the new csv hector input files
+#' @param iniprefix_ optional string prefix to add the ini file name 
 #' @return str of the ini files 
 #' @export
 #' @importFrom assertthat assert_that
-make_new_ini <- function(files){
+make_new_ini <- function(files, iniprefix_ = NULL){
   
   # Silence global variables 
   assert_that(all(file.exists(files)))
@@ -138,7 +139,7 @@ make_new_ini <- function(files){
     new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = name)
     
     write_to <- dirname(dirname(f))
-    ini_path <- file.path(write_to, paste0(name, '.ini'))
+    ini_path <- file.path(write_to, paste0(iniprefix_, name, '.ini'))
     writeLines(new_ini, ini_path)
     
     return(ini_path)

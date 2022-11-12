@@ -6,7 +6,6 @@
 #'
 #' @param scenarios_to_process string vector of the scenario names to process
 #' @import data.table
-#' @importFrom %>% magrittr
 #' @return data frame of Hector inputs for multiple scenarios 
 #' @export
 process_v25_data <- function(scenarios_to_process=NULL){
@@ -115,7 +114,7 @@ generate_v25_files <- function(scenarios_to_process=NULL, depends_on = c("hector
   inis <- mapply(function(ofile, scn){
     # Define the new ini path
     new_path <- file.path("tables",  basename(ofile))
-    new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = name)
+    new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = scn)
     
     # Add albedo values into the ini file that match the old values.
     RF_index <- which(grepl(pattern = "albedo", x = new_ini))

@@ -11,8 +11,9 @@ process_rcmip_data <- function(scenarios_to_process=NULL){
 
   # Import the concentrations, emissions, and radiative forcing 
   # files and subset to include only the data to process.
-  files <- list.files(rcmip_dir, full.names = TRUE, pattern = "means")
-  all_data <- as.data.table(do.call(lapply(files, read.csv), what = "rbind"))
+  data_list <- lapply(X = list.files(rcmip_dir, full.names = TRUE, pattern = "means"),
+                      FUN = read.csv)
+  all_data <- rbindlist(data_list, fill = TRUE)
 
   if(is.null(scenarios_to_process)){
     scenarios_to_process <- c("rcp60", "ssp370", "ssp370-lowNTCF-aerchemmip", "ssp370-lowNTCF-gidden",    
@@ -95,22 +96,44 @@ generate_rcmip_submission_files <- function(scenarios_to_process=NULL, depends_o
                               "ssp460", "ssp534-over", "ssp585", "rcp26", "rcp45", "rcp60", "rcp85")
   }
   
-  
-  data <- hinput_data[scenario %in% scenarios_to_process, ]
-  
-  
-  # Format and save the emissions and concentration constraints in the csv files
-  # in the proper Hector table input file. 
-  data_list <- split(data, data$scenario)
-  for(dat in data_list){
-    ofile <- write_hector_csv(dat, 
-                              required = c(REQUIRED_EMISSIONS, REQUIRED_RF), 
-                              info_source = "rcmip", 
-                              write_to = TABLES_DIR, 
-                              end_tag = "_emiss-constraints_rf")
-    inis <- make_new_ini(ofile)
+  # Process the future multi-forcing driven scenarios, use these to 
+  # construct both emission and concentration driven runs. 
+  multi_forcing_scn <- intersect(scenarios_to_process, c("ssp119", "ssp126", "ssp245", "ssp370", "ssp434",
+                                   "ssp460", "ssp534-over", "ssp585"))
+  if(length(multi_forcing_scn) > 1){
+    data <- hinput_data[scenario %in% multi_forcing_scn, ]
     
-  }
+    # Format and save the emissions and concentration constraints in the csv files
+    # in the proper Hector table input file. 
+    data_list <- split(data, data$scenario)
+    for(dat in data_list){
+      info_source <- "rcmip"
+      end_tag <- "_emiss-constraints_rf"
+      
+      ofile <- write_hector_csv(dat, 
+                                required = c(REQUIRED_EMISSIONS, REQUIRED_RF, WM_GHG_CONSTRAINTS), 
+                                info_source = info_source, 
+                                write_to = TABLES_DIR, 
+                                end_tag = end_tag)
+      # Make emission driven ini files the RCMIP phase one submission 
+      # uses esm- as a prefix. 
+      inis <- make_new_ini(ofile, iniprefix_ = "esm-")
+      
+      # Construct the concentration driven ini file, here we will need to activate all of the 
+      # well mixed ghg concentration constraints 
+      scn <- unique(dat$scenario)
+      new_path <- file.path('tables', basename(ofile))
+      new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = scn)
+      new_ini <- activate_input_variables(lines = new_ini, vars = WM_GHG_CONSTRAINTS)
+
+      write_to <- gsub(pattern = "/tables", x = dirname(ofile), replacement = "")
+      name <- paste0(info_source, "_", scn)
+      ini_path <- file.path(write_to, paste0(name, ".ini"))
+      writeLines(new_ini, ini_path)
+      
+    }
+    
+    }
 }
   
   
