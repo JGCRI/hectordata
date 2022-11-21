@@ -8,13 +8,13 @@ process_rcmip_data <- function(scenarios_to_process=NULL){
   
   rcmip_dir <- find_input_dir(dir = ZENODO_DIR, "rcmip")
   assertthat::assert_that(dir.exists(rcmip_dir), msg = "data dir not found")
-
+  
   # Import the concentrations, emissions, and radiative forcing 
   # files and subset to include only the data to process.
   data_list <- lapply(X = list.files(rcmip_dir, full.names = TRUE, pattern = "means"),
-                      FUN = read.csv)
+                      FUN = utils::read.csv)
   all_data <- rbindlist(data_list, fill = TRUE)
-
+  
   if(is.null(scenarios_to_process)){
     scenarios_to_process <- c("rcp60", "ssp370", "ssp370-lowNTCF-aerchemmip", "ssp370-lowNTCF-gidden",    
                               "ssp434", "ssp460", "rcp26", "ssp119",                   
@@ -60,6 +60,18 @@ process_rcmip_data <- function(scenarios_to_process=NULL){
   names(converted_cmip6) <- c('scenario', 'year', 'variable', 'units')
   converted_cmip6[['value']] <- new_values
   
+  # All of the concentration driven idealized will need to use the RCMIP preindustrial CO2 concentration
+  # for the pre 1850 inputs. 
+  conc_idealized_scns <- c("1pctCO2", "1pctCO2-4xext", "abrupt-0p5xCO2", "abrupt-2xCO2", "abrupt-4xCO2")
+  missing_years <- 1745:1849
+  missing_idealized_conc_data <- data.table(scenario = rep(conc_idealized_scns, each = length(missing_years)), 
+                                            year = rep(missing_years, length(conc_idealized_scns)),
+                                            variable = hector::CO2_CONSTRAIN(), 
+                                            units = hector::getunits(hector::CO2_CONSTRAIN()), 
+                                            value = RCMIP.PREIND_CO2)
+  
+  converted_cmip6 <- rbind(missing_idealized_conc_data, converted_cmip6)
+  
   # Interpolate the data over the missing years.
   complete_data <- complete_missing_years(converted_cmip6, expected_years = YEARS)
   
@@ -69,7 +81,7 @@ process_rcmip_data <- function(scenarios_to_process=NULL){
   
   # Save intermediate data.
   ofile <- file.path(INTERMEDIATE_DIR, "rcmip_data.csv")
-  write.csv(x = final_data, file = ofile, row.names = FALSE)
+  utils::write.csv(x = final_data, file = ofile, row.names = FALSE)
   return(final_data)
   
 }
@@ -89,18 +101,23 @@ generate_rcmip_submission_files <- function(scenarios_to_process=NULL, depends_o
   assertthat::assert_that(all(file.exists(data_files)), msg = "some element of depends_on does not exist")
   
   # Load the hector input data. 
-  hinput_data <- as.data.table(read.csv(data_files))
+  hinput_data <- as.data.table(utils::read.csv(data_files))
   
   if(is.null(scenarios_to_process)){
-    scenarios_to_process <- c("ssp119", "ssp126", "ssp245", "ssp370", "ssp434", 
-                              "ssp460", "ssp534-over", "ssp585", "rcp26", "rcp45", "rcp60", "rcp85")
+    scenarios_to_process <- hinput_data$scenario
   }
+  
+  
+  # Check to see if missing data 
+  existing_scns <- unique(hinput_data$scenario)
+  missing <- setdiff(scenarios_to_process, existing_scns)
+  assertthat::assert_that(length(missing) == 0, msg = paste("missing data for: ", paste0(missing, collapse = ", ")))
   
   # Process the future multi-forcing driven scenarios, use these to 
   # construct both emission and concentration driven runs. 
   multi_forcing_scn <- intersect(scenarios_to_process, c("ssp119", "ssp126", "ssp245", "ssp370", "ssp434",
-                                   "ssp460", "ssp534-over", "ssp585"))
-  if(length(multi_forcing_scn) > 1){
+                                                         "ssp460", "ssp534-over", "ssp585", "rcp26", "rcp45", "rcp60", "rcp85"))
+  if(length(multi_forcing_scn) >= 1){
     data <- hinput_data[scenario %in% multi_forcing_scn, ]
     
     # Format and save the emissions and concentration constraints in the csv files
@@ -125,7 +142,7 @@ generate_rcmip_submission_files <- function(scenarios_to_process=NULL, depends_o
       new_path <- file.path('tables', basename(ofile))
       new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = scn)
       new_ini <- activate_input_variables(lines = new_ini, vars = WM_GHG_CONSTRAINTS)
-
+      
       write_to <- gsub(pattern = "/tables", x = dirname(ofile), replacement = "")
       name <- paste0(info_source, "_", scn)
       ini_path <- file.path(write_to, paste0(name, ".ini"))
@@ -133,7 +150,49 @@ generate_rcmip_submission_files <- function(scenarios_to_process=NULL, depends_o
       
     }
     
+  }
+  
+  ideal_scn <- intersect(scenarios_to_process, c("1pctCO2", "1pctCO2-4xext", "abrupt-0p5xCO2", "abrupt-2xCO2",
+                                                 "abrupt-4xCO2", "piControl"))
+  if(length(ideal_scn) >= 1){
+    data <- hinput_data[scenario %in% ideal_scn, ]
+    info_source <- "rcmip"
+    end_tag <- "_constraints"
+    
+    data_list <- split(data, data$scenario)
+    for(dat in data_list){
+      scn <- unique(dat$scenario)
+      
+      ofile <- write_hector_csv(dat[variable == "CO2_constrain", ], 
+                                required = "CO2_constrain", 
+                                info_source = info_source, 
+                                write_to = TABLES_DIR, 
+                                end_tag = end_tag)
+      
+      # Construct the concentration driven ini file, here we will need to activate all of the 
+      # well mixed ghg concentration constraints 
+      new_path <- file.path('tables', basename(ofile))
+      new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = scn)
+      
+      var_id <- identify_csv_inputs(new_ini)
+      to_zero_out <- var_id[variable_name != "CO2_constrain", ]
+      zeroed_vals  <- gsub(pattern = "=csv:tables(.*)", replacement = "[1745]=0", x = new_ini[to_zero_out$ini_index])
+      new_ini[to_zero_out$ini_index] <- zeroed_vals
+      
+      new_ini <- activate_input_variables(lines = new_ini, vars = "CO2_constrain")
+      
+      write_to <- gsub(pattern = "/tables", x = dirname(ofile), replacement = "")
+      name <- paste0(info_source, "_", scn)
+      ini_path <- file.path(write_to, paste0(name, ".ini"))
+      writeLines(new_ini, ini_path)
+      
     }
+    
+    
+    
+  }
+  
+  
+  
 }
-  
-  
+

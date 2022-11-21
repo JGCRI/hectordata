@@ -7,7 +7,7 @@
 #' @param end_tag string used at the end of of the table file, in most cases will be default name "_emiss-constraints_rf"
 #' @return str file name 
 #' @import assertthat 
-write_hector_csv <- function(x, required, write_to, info_source, end_tag = "_emiss-constraints_rf"){
+write_hector_csv <- function(x, required=NULL, write_to, info_source, end_tag = "_emiss-constraints_rf"){
   
   # Format and save the emissions and concentration constraints in the csv files 
   # in the proper Hector table input file. 
@@ -19,9 +19,11 @@ write_hector_csv <- function(x, required, write_to, info_source, end_tag = "_emi
   assert_that(length(scn) == 1)
   fname <- file.path(write_to, paste0(info_source, '_', scn, end_tag, '.csv'))
   
-  missing <- !required %in% unique(x[["variable"]])
-  assert_that(all(!missing), msg = paste("Missing required variable(s):", paste0(required[missing], collapse = ", ")))
-  
+  if(!is.null(required)){
+    missing <- !required %in% unique(x[["variable"]])
+    assert_that(all(!missing), msg = paste("Missing required variable(s):", paste0(required[missing], collapse = ", ")))
+  }
+
   # Transform the data frame into the wide format that Hector expects. 
   input_data <- dcast(as.data.table(x)[, list(Date = year, variable, value)], Date ~ variable)
  

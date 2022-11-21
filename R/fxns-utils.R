@@ -80,26 +80,28 @@ process_carbon_cycle_emissions <- function(dat){
 
   # Check to make sure that the inpout had the correct names & variables. 
   assertthat::assert_that(assertthat::has_name(x = dat, which = c("year", "variable","units", "value", "scenario")))
-  assertthat::assert_that(all(c("ffi_emissions", "luc_emissions") %in% unique(dat[['variable']])))
   assertthat::assert_that(is.data.table(dat))
   
-  
-  # Subset the input data to the two sources of carbon emissions.
-  carbon_emissions <- unique(dat[dat[ , variable %in% c("ffi_emissions", "luc_emissions")]])
-  wide_data <- dcast(carbon_emissions,  year + scenario + units ~ variable)
-  
-  # Format the fossil fuel emissions and land use change emissions so that the values 
-  # are postivie, if the emissions are negative read them in as dacccs or land uptake. 
-  wide_data[, daccs_uptake := ifelse(ffi_emissions <= 0, -1 * ffi_emissions, 0)]
-  wide_data[, ffi_emissions := ifelse(ffi_emissions >= 0, ffi_emissions, 0)]
-  wide_data[, luc_uptake := ifelse(luc_emissions <= 0, -1 * luc_emissions, 0)]
-  wide_data[, luc_emissions := ifelse(luc_emissions >= 0, luc_emissions, 0)]
-  
-  # Add the new carbon emissions to the emissions data frame and return output. 
-  rbind(melt(wide_data, id.vars = c("scenario", "year", "units")) , 
-        dat[dat[ , !variable %in% c("ffi_emissions", "luc_emissions")]]) -> 
-    out
-  
+  process <- intersect(c("ffi_emissions", "luc_emissions"), dat$variable)
+  if(length(process) > 0){
+    # Subset the input data to the two sources of carbon emissions.
+    carbon_emissions <- unique(dat[dat[ , variable %in% c("ffi_emissions", "luc_emissions")]])
+    wide_data <- dcast(carbon_emissions,  year + scenario + units ~ variable)
+    
+    # Format the fossil fuel emissions and land use change emissions so that the values 
+    # are postivie, if the emissions are negative read them in as dacccs or land uptake. 
+    wide_data[, daccs_uptake := ifelse(ffi_emissions <= 0, -1 * ffi_emissions, 0)]
+    wide_data[, ffi_emissions := ifelse(ffi_emissions >= 0, ffi_emissions, 0)]
+    wide_data[, luc_uptake := ifelse(luc_emissions <= 0, -1 * luc_emissions, 0)]
+    wide_data[, luc_emissions := ifelse(luc_emissions >= 0, luc_emissions, 0)]
+    
+    # Add the new carbon emissions to the emissions data frame and return output. 
+    rbind(melt(wide_data, id.vars = c("scenario", "year", "units")) , 
+          dat[dat[ , !variable %in% c("ffi_emissions", "luc_emissions")]]) -> 
+      out
+  }else{
+    out <- dat
+  }
   return(out)
 }
 
@@ -123,8 +125,8 @@ fetch_minted_data <- function(version = "0.0.0.91", write_to = ZENODO_DIR){
   dest_file <- file.path(write_to, "data.zip")
   
   if(!file.exists(dest_file)){
-    download.file(url, dest_file)
-    unzip(zipfile = dest_file, exdir = write_to)
+    utils::download.file(url, dest_file)
+    utils::unzip(zipfile = dest_file, exdir = write_to)
   }
   
 }
@@ -153,7 +155,7 @@ extract_header_info <- function(f){
   
   assert_that(file.exists(f))
   
-  lines <- head(read.csv(f))
+  lines <- utils::head(utils::read.csv(f))
   
   assert_that(sum(grepl(x = lines[ ,1], pattern = ";")) > 1)
   

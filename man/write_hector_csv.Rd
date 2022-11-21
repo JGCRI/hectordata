@@ -6,7 +6,7 @@
 \usage{
 write_hector_csv(
   x,
-  required,
+  required = NULL,
   write_to,
   info_source,
   end_tag = "_emiss-constraints_rf"

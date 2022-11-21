@@ -9,7 +9,7 @@ conversion_table <- list()
 # For the SSP inputs we use the conversion table originally created for the RCMIP project see 
 # https://github.com/ashiklom/hector-rcmip/tree/master/inst, modified for Hector v3. 
 path <- here::here('data-raw', 'RCMIP_variable-conversion.csv') 
-rcmip <- read.csv(path, stringsAsFactors = FALSE)
+rcmip <- utils::read.csv(path, stringsAsFactors = FALSE)
 
 # Because of how RCMIP conversion table was formatted make sure that the strings do not start with a space. 
 cols_to_modify <- which(names(rcmip) %in% c("Model", "Scenario", "Region", "Variable", "Unit", "Mip_Era"))
@@ -21,7 +21,7 @@ conversion_table[["rcmip"]] <- rcmip
 # ---------------------------------------------------------------------------------------------------
 # Mapping for the variable names 
 path <- here::here('data-raw', 'v25_variable-mapping.csv') 
-v25 <- as.data.table(read.csv(path, stringsAsFactors = FALSE))
+v25 <- as.data.table(utils::read.csv(path, stringsAsFactors = FALSE))
 conversion_table[["v25"]] <- v25
 
 

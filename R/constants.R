@@ -27,3 +27,7 @@ WM_GHG_CONSTRAINTS <- c("CO2_constrain", "CH4_constrain", "N2O_constrain", "C2F6
                         "HFC125_constrain", "HFC134a_constrain", "HFC143a_constrain", "HFC227ea_constrain", 
                         "HFC23_constrain", "HFC245fa_constrain", "HFC32_constrain", 
                         "HFC4310_constrain", "SF6_constrain")
+
+
+# RCMIP Related ---------------------------------------------------------------------------
+RCMIP.PREIND_CO2 <- 284.317 # Pre industrial CO2 concentrations as defined by RCMIP (https://doi.org/10.5194/gmd-13-5175-2020)
