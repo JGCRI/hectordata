@@ -15,7 +15,7 @@ test_that("write_hector_csv works", {
                           info_source = "test", end_tag = "test")
   
   # Read in the csv file & check the contents of the data frame. 
-  out_df <- read.csv(out, comment.char = ";")
+  out_df <- utils::read.csv(out, comment.char = ";")
   expect_equal(nrow(out_df), length(df$year))
   expect_equal(ncol(out_df), (length(unique(df$variable)) + 1))
   
