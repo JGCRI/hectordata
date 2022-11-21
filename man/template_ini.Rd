@@ -5,8 +5,8 @@
 \alias{template_ini}
 \title{template_ini}
 \format{
-A vector
-\describe{ A character vector where each element in the vector contains a different
+character
+\describe{ A character vector where each element vector contains a different
 line of hector ini file.
 }
 }
@@ -14,6 +14,6 @@ line of hector ini file.
 template_ini
 }
 \description{
-A character vector consisting of Hector inputs.
+Character vector of the ini lines
 }
 \keyword{datasets}

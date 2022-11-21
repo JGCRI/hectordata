@@ -4,8 +4,8 @@ simpleNbox,ffi_emissions, PgC year-1, 1/12.01 Pg year-1,Emissions|CO2|MAGICC Fos
 simpleNbox,luc_emissions, PgC year-1, 1/12.01 Pg year-1,Emissions|CO2|AFOLU, Mt CO2 year-1, Mt 1/44.01 year-1
 simpleNbox,luc_emissions, PgC year-1, 1/12.01 Pg year-1,Emissions|CO2|MAGICC AFOLU, Mt CO2 year-1, Mt 1/44.01 year-1
 simpleNbox,CO2_constrain, ppm, ppm,Atmospheric Concentrations|CO2, ppm, ppm
-simpleNbox,Ftalbedo, W m-2, W m-2,Radiative Forcing|Anthropogenic|Albedo Change, W m-2, W m-2
-simpleNbox,Ftalbedo, W m-2, W m-2,Effective Radiative Forcing|Anthropogenic|Albedo Change, W m-2, W m-2
+simpleNbox,RF_albedo, W m-2, W m-2,Radiative Forcing|Anthropogenic|Albedo Change, W m-2, W m-2
+simpleNbox,RF_albedo, W m-2, W m-2,Effective Radiative Forcing|Anthropogenic|Albedo Change, W m-2, W m-2
 so2,SO2_emissions, Gg S year-1, Gg 1/32.1 year-1,Emissions|Sulfur, Mt SO2 year-1, Mt 1/64.1 year-1
 so2,SV, W m-2, W m-2,Radiative Forcing|Natural|Volcanic, W m-2, W m-2
 so2,SV, W m-2, W m-2,Effective Radiative Forcing|Natural|Volcanic, W m-2, W m-2
@@ -24,7 +24,7 @@ HFC134a_halocarbon,HFC134a_constrain, ppt, ppt,Atmospheric Concentrations|F-Gase
 HFC143a_halocarbon,HFC143a_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC143a, ppt, ppt
 HFC227ea_halocarbon,HFC227ea_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC227ea, ppt, ppt
 HFC23_halocarbon,HFC23_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC23, ppt, ppt
-HFC245_halocarbon,HFC245_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC245fa, ppt, ppt
+HFC245fa_halocarbon,HFC245fa_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC245fa, ppt, ppt
 HFC32_halocarbon,HFC32_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC32, ppt, ppt
 HFC365_halocarbon,HFC365_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC365mfc, ppt, ppt
 HFC4310_halocarbon,HFC4310_constrain, ppt, ppt,Atmospheric Concentrations|F-Gases|HFC|HFC4310mee, ppt, ppt

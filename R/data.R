@@ -1,27 +1,23 @@
 #' template_ini
 #'
-#' A character vector consisting of Hector inputs. 
+#' Character vector of the ini lines
 #'
-#' @format A vector 
-#' \describe{ A character vector where each element in the vector contains a different 
+#' @format character
+#' \describe{ A character vector where each element vector contains a different 
 #' line of hector ini file. 
 #' }
 'template_ini'
 
 
-#' rcmipCMIP6_conversion
+#' conversion_table
 #'
-#' A data.table containing information that is used to convert the RCMIP emissions and 
-#' concentration into Hector inputs.
+#' List of data.tables containing information that is used to convert input data provided from 
+#' various sources such as IIASA, GCAM, RCMIP and so on into the appropriate values for Hector. 
 #'
-#' @format A data.table of 7 columns and 99 rows. 
-#' \describe{ A character vector where each element in the vector contains a different 
-#' \item{hector_component}{String character of the Hector component of the hector_variable.}
-#' \item{hector_variable}{String character variable name in the Hector format.}
-#' \item{hector_unit}{String character of the units expected by Hector.}
-#' \item{hector_udunits}{String character of the Hector units that can be used by \code{ud_convert2}.}
-#' \item{rcmip_variable}{String character variable name in the RCMIP format.}
-#' \item{rcmip_units}{String character of the units of the RCMIP variable.}
-#' \item{rcmip_udunits}{String character of the units of the RCMIP variable that can be used by \code{ud_convert2}.}
+#' @format list of data tables
+#' \describe{list of data tables, each data table contains the mapping between inputs and hector. Any column with the 
+#' udunits tag can be used by the ud_convert2 function
+#' \item{rcmip}{data table of 74 rows with 7 columns  hector_component, hector_variable, hector_unit, hector_udunits
+#'  rcmip_variable, rcmip_units, rcmip_udunits.}
 #' }
-'rcmipCMIP6_conversion'
+'conversion_table'
