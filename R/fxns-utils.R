@@ -185,3 +185,47 @@ rename <- function(dat, cols){
   return(dat)
 }
 
+
+#' check column names
+#'
+#' @param dat data frame object to check the colunm names of
+#' @param req str vector of the required column names
+#' @return TRUE if the conditions are met otherwise will throw and error if a column is missing 
+#' @importFrom assertthat assert_that
+#' @noRd
+check_cols <- function(dat, req){
+  
+  col_names <- names(dat)
+  missing <- setdiff(req, col_names)
+  x <- assert_that(length(missing) == 0, msg = paste("missing columns: ", paste0(missing, collapse = ", ")))
+
+  return(x)
+}
+
+
+
+#' Import intermediate data files
+#'
+#' @param csv_files str vector of the  intermediate files to be read in 
+#' @importFrom assertthat assert_that
+#' @return data frame of Hector inputs must be in the correct units and variables names 
+#' @noRd
+read_intermediate_data <- function(csv_file){
+  
+  data_files <- file.path(INTERMEDIATE_DIR, csv_file)
+  missing <- !file.exists(data_files)
+  assert_that(sum(missing)==0, msg = paste("missing files: ", paste0(basename(data_files)[missing], collapse = , ", ")))
+
+  # Load the hector input data. 
+  data <- as.data.table(utils::read.csv(data_files))
+  
+  assert_that(check_cols(data, req = c("scenario", "year", "units", "variable", "value")))
+  
+  return(data)
+    
+}
+
+
+
+
+

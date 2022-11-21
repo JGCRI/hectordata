@@ -54,3 +54,13 @@ test_that('process_carbon_cycle_emissions', {
   expect_equal(length(unique(out$variable)), 4)
  
 })
+
+
+test_that("check_cols", {
+  
+  data <- data.frame("col1" = sample(1:10, size = 5), 
+                     "col2" = sample(1:10, size = 5))
+  expect_true(check_cols(dat = data, req = c("col1", "col2")))
+  expect_error(check_cols(dat = data, req = c("fake")), "missing columns:  fake")
+  
+})
