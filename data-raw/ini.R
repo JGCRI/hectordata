@@ -22,4 +22,4 @@ if(!any(deactivated_constraints)){
 } 
 
 template_ini <- ini_lines
-usethis::use_data(template_ini, overwrite = TRUE)
+usethis::use_data(template_ini, overwrite = TRUE, internal = FALSE)

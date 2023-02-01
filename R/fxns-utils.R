@@ -110,7 +110,7 @@ process_carbon_cycle_emissions <- function(dat){
 #'
 #' @param version str value corresponding to the version of the data on zenodo, default is set to 0.0.0.91
 #' @param write_to str directory location where to download the data to
-#' @return 
+#' @return NULL the minted data will be written to the ZENODO_DIR 
 #' @importFrom assertthat assert_that
 #' @noRd
 fetch_minted_data <- function(version = "0.0.0.91", write_to = ZENODO_DIR){

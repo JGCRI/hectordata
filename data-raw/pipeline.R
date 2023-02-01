@@ -1,6 +1,6 @@
 # TODO there has to be be a better way to do this may be with a drake pipeline idk
-devtools::load_all()
-
+library(hectordata)
+library(hector)
 
 # Download and process data  
 # NOTE: this step can take a while and only needs to be done once
@@ -10,3 +10,4 @@ process_v25_data()
 
 generate_rcmip_submission_files()
 generate_v25_files()
+generate_idealized_files()

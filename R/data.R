@@ -1,10 +1,6 @@
-#' template_ini
-#'
-#' Character vector of the ini lines
-#'
 #' @format character
-#' \describe{ A character vector where each element vector contains a different 
-#' line of hector ini file. 
+#' \describe{ A character vector where each element vector contains a different
+#' line of hector ini file.
 #' }
 'template_ini'
 

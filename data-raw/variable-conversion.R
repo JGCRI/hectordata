@@ -27,4 +27,4 @@ conversion_table[["v25"]] <- v25
 
 # ---------------------------------------------------------------------------------------------------
 # Save the table as internal package data. 
-usethis::use_data(conversion_table, overwrite = TRUE, compress = "xz")
+usethis::use_data(conversion_table, overwrite = TRUE, compress = "xz", internal = FALSE)

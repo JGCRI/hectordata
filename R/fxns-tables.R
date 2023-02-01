@@ -25,6 +25,7 @@ write_hector_csv <- function(x, required=NULL, write_to, info_source, end_tag = 
   }
 
   # Transform the data frame into the wide format that Hector expects. 
+  # TODO add a check that makes sure contents are unque! There should be no dupplicate values!
   input_data <- dcast(as.data.table(x)[, list(Date = year, variable, value)], Date ~ variable)
  
   # Add the header information to the csv table. 

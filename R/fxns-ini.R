@@ -37,6 +37,7 @@ identify_csv_inputs <- function(lines){
 #' @param lines character containing the Hector ini input. 
 #' @param vars a vector of the character files. 
 #' @return the lines of the modified ini file.  
+#' @import hector
 #' @export
 deactivate_input_variables <- function(lines, vars){
   
