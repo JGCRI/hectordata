@@ -112,7 +112,7 @@ process_carbon_cycle_emissions <- function(dat){
 #' @param write_to str directory location where to download the data to
 #' @return NULL the minted data will be written to the ZENODO_DIR 
 #' @importFrom assertthat assert_that
-#' @noRd
+#' @export
 fetch_minted_data <- function(version = "0.0.0.91", write_to = ZENODO_DIR){
   
   URL_list <- c("0.0.0.9000" = "https://zenodo.org/record/7221866/files/data.zip?download=1", 

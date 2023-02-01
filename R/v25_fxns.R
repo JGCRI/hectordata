@@ -7,6 +7,7 @@
 #' @param scenarios_to_process string vector of the scenario names to process
 #' @import data.table
 #' @return data frame of Hector inputs for multiple scenarios 
+#' @importFrom magrittr %>%
 #' @export
 process_v25_data <- function(scenarios_to_process=NULL){
   v25_dir <- find_input_dir(info_source = "v25")

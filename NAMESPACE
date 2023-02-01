@@ -2,6 +2,7 @@
 
 export(activate_input_variables)
 export(deactivate_input_variables)
+export(fetch_minted_data)
 export(generate_idealized_files)
 export(make_new_ini)
 export(process_rcmip_data)
@@ -21,4 +22,5 @@ importFrom(data.table,.N)
 importFrom(data.table,.NGRP)
 importFrom(data.table,.SD)
 importFrom(data.table,data.table)
+importFrom(magrittr,"%>%")
 importFrom(zoo,na.approx)

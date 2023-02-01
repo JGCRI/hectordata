@@ -11,6 +11,7 @@ Depends: R (>= 2.10)
 Imports:
     udunits2 (>= 0.13),
     data.table (>= 1.12.8), 
+    hector,
     zoo (>= 1.8), 
     assertthat (>= 0.2.1), 
     magrittr (>= 1.5),
