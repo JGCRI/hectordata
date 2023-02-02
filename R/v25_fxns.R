@@ -10,13 +10,16 @@
 #' @importFrom magrittr %>%
 #' @export
 process_v25_data <- function(scenarios_to_process=NULL){
+  
+  . <- scenario <- value <- v3_variable <- variable <- Date <- SV <-  NULL
+  
   v25_dir <- find_input_dir(info_source = "v25")
   
   # Import v2.5 data files change from wide to long format. 
   rcp_files <- list.files(v25_dir, pattern = "RCP", full.names = TRUE) 
   do.call(lapply(rcp_files, function(f){ 
     # Save a copy of the long data frame
-    data <- rename(melt.data.table(data = as.data.table(read.csv(f, comment.char = ";")),
+    data <- rename(melt.data.table(data = as.data.table(utils::read.csv(f, comment.char = ";")),
                                    id.vars = "Date", variable.name = "variable",
                                    value.name = "value", variable.factor = FALSE), c("year" = "Date"))
     scn <- gsub(x = basename(f), pattern = "_emissions.csv", replacement = "")
@@ -32,7 +35,7 @@ process_v25_data <- function(scenarios_to_process=NULL){
   # Map from the old variable names to the new ones
   long_data %>%
     rename(cols = c("v25_variable" = "variable")) %>%
-    .[conversion_table$v25, on = "v25_variable"] %>%
+    .[hectordata::conversion_table$v25, on = "v25_variable"] %>%
     .[ , list(scenario, year, value, variable = v3_variable)] ->
     mapped_data
   
@@ -55,7 +58,7 @@ process_v25_data <- function(scenarios_to_process=NULL){
   # Read in the volcanic data and save a copy for each scenario.
   sv_data_perscn <- do.call(lapply(X = scenarios_to_process, function(scn){
     
-    d <-  as.data.table(read.csv(list.files(find_input_dir(info_source = "v25"),
+    d <-  as.data.table(utils::read.csv(list.files(find_input_dir(info_source = "v25"),
                                             pattern = "vol", full.names = TRUE), comment.char = ";"))
     d <- d[,list(year = Date, value = SV)]
     d$scenario <- scn
@@ -70,7 +73,7 @@ process_v25_data <- function(scenarios_to_process=NULL){
   
   # Save intermediate data.
   ofile <- file.path(INTERMEDIATE_DIR, "hectorv2_data.csv")
-  write.csv(x = final_data, file = ofile, row.names = FALSE)
+  utils::write.csv(x = final_data, file = ofile, row.names = FALSE)
   return(final_data)
   
 }
@@ -85,12 +88,15 @@ process_v25_data <- function(scenarios_to_process=NULL){
 #' @return nothing writes out the csv and ini files
 generate_v25_files <- function(scenarios_to_process=NULL, depends_on = c("hectorv2_data.csv")){
   
+  # Silence global variables
+  scenario <- NULL
+  
   # Check to make sure the data exists. 
   data_files <- file.path(INTERMEDIATE_DIR, depends_on)
   assertthat::assert_that(all(file.exists(data_files)), msg = "some element of depends_on does not exist")
   
   # Load the hector input data. 
-  hinput_data <- as.data.table(read.csv(data_files))
+  hinput_data <- as.data.table(utils::read.csv(data_files))
   
   if(is.null(scenarios_to_process)){
     scenarios_to_process <- c("rcp26", "rcp45", "rcp6", "rcp85")
@@ -115,7 +121,7 @@ generate_v25_files <- function(scenarios_to_process=NULL, depends_on = c("hector
   inis <- mapply(function(ofile, scn){
     # Define the new ini path
     new_path <- file.path("tables",  basename(ofile))
-    new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = scn)
+    new_ini <- replace_csv_string(hectordata::template_ini, replacement_path = new_path, run_name = scn)
     
     # Add albedo values into the ini file that match the old values.
     RF_index <- which(grepl(pattern = "albedo", x = new_ini))

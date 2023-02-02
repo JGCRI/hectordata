@@ -137,7 +137,7 @@ make_new_ini <- function(files, iniprefix_ = NULL){
     name <- gsub(x = basename(f), pattern = "_emiss-constraints_rf.csv", replacement = "")
     
     new_path <- file.path('tables', basename(f))
-    new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = name)
+    new_ini <- replace_csv_string(hectordata::template_ini, replacement_path = new_path, run_name = name)
     
     write_to <- dirname(dirname(f))
     ini_path <- file.path(write_to, paste0(iniprefix_, name, '.ini'))

@@ -1,3 +1,8 @@
+#' template_ini
+#'
+#' List of data.tables containing information that is used to convert input data provided from 
+#' various sources such as IIASA, GCAM, RCMIP and so on into the appropriate values for Hector. 
+#'
 #' @format character
 #' \describe{ A character vector where each element vector contains a different
 #' line of hector ini file.

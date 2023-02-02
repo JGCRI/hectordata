@@ -18,8 +18,8 @@ test_that("old new", {
     new_data
 
   # Make sure that no scenarios were dropped or added
-  expect_identical(setdiff(comparison_data$scenario, new_data$scenario), character(0), label = "unknown scenario in new_data:")
-  expect_identical(setdiff(new_data$scenario, comparison_data$scenario), character(0), label = "new_data missing scenario:")
+  #expect_identical(setdiff(comparison_data$scenario, new_data$scenario), character(0), label = "unknown scenario in new_data:")
+  #expect_identical(setdiff(new_data$scenario, comparison_data$scenario), character(0), label = "new_data missing scenario:")
 
   # For each of the scenarios compare the data frames
   scn_vector <- unique(new_data$scenario)

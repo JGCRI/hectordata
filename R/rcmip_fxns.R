@@ -6,6 +6,8 @@
 #' @export
 process_rcmip_data <- function(scenarios_to_process=NULL){
   
+  Scenario <- Region <- hector_variable <- hector_unit <- NULL
+  
   rcmip_dir <- find_input_dir(dir = ZENODO_DIR, "rcmip")
   assertthat::assert_that(dir.exists(rcmip_dir), msg = "data dir not found")
   
@@ -38,15 +40,15 @@ process_rcmip_data <- function(scenarios_to_process=NULL){
   # Add the conversion data table information to the raw data with an inner join so that only variables that
   # have conversion information will be converted. The raw inputs include values for variables that Hector
   # does not have that are required by other classes of simple climate models.
-  input_conversion_table <- stats::na.omit(long_inputs[conversion_table$rcmip, on = c('Variable' = 'rcmip_variable'), nomatch=NA])
+  input_conversion_table <- stats::na.omit(long_inputs[hectordata::conversion_table$rcmip, on = c('Variable' = 'rcmip_variable'), nomatch=NA])
   
   # Convert the value column from RCMIP units to Hector units.
   # This step may take a while depending on the number of scenarios being
   # processed.
   new_values <- unlist(mapply(ud_convert2,
-                              x = input_conversion_table$value,
-                              from = input_conversion_table$rcmip_udunits,
-                              to = input_conversion_table$hector_udunits,
+                              x = hectordata::input_conversion_table$value,
+                              from = hectordata::input_conversion_table$rcmip_udunits,
+                              to = hectordata::input_conversion_table$hector_udunits,
                               SIMPLIFY = FALSE))
   
   # Create the data table of the inputs that have the Hector relevant variable, units, and values by selecting
@@ -79,6 +81,9 @@ process_rcmip_data <- function(scenarios_to_process=NULL){
 #' @param depends_on string vector of the required intermeidate data tables
 #' @return nothing writes out the csv and ini files
 generate_rcmip_submission_files <- function(scenarios_to_process=NULL, depends_on = c("rcmip_data.csv")){
+  
+  # Silence global variable
+  scenario <- NULL 
   
   hinput_data <- read_intermediate_data(depends_on)
   
@@ -125,7 +130,7 @@ generate_rcmip_submission_files <- function(scenarios_to_process=NULL, depends_o
       # well mixed ghg concentration constraints 
       scn <- unique(dat$scenario)
       new_path <- file.path('tables', basename(ofile))
-      new_ini <- replace_csv_string(template_ini, replacement_path = new_path, run_name = scn)
+      new_ini <- replace_csv_string(hectordata::template_ini, replacement_path = new_path, run_name = scn)
       new_ini <- activate_input_variables(lines = new_ini, vars = WM_GHG_CONSTRAINTS)
       
       write_to <- gsub(pattern = "/tables", x = dirname(ofile), replacement = "")

@@ -16,4 +16,4 @@ here::here("inst", "input", "tables") %>%
   rbindlist(fill=TRUE) -> 
   comp_data
 
-write.csv(comp_data, here::here("tests", "testthat", "old_new_data.csv"), row.names = FALSE)
+utils::write.csv(comp_data, here::here("tests", "testthat", "old_new_data.csv"), row.names = FALSE)

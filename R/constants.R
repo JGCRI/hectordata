@@ -1,4 +1,5 @@
 YEARS <- 1745:2500 
+HECTORDATA_VERSION <- "0.0.0.9000" # TODO figure out a better way to do this!
 
 SCRATCH_DIR <- tempdir()
 TABLES_DIR <- here::here("inst", "input", "tables")

@@ -78,9 +78,12 @@ complete_missing_years <- function(data, expected_years = 1700:2500){
 #' @noRd
 process_carbon_cycle_emissions <- function(dat){
 
+  # Silence global variable checks
+  variable <- daccs_uptake <- ffi_emissions <- luc_uptake <- luc_emissions <- NULL
+    
   # Check to make sure that the inpout had the correct names & variables. 
-  assertthat::assert_that(assertthat::has_name(x = dat, which = c("year", "variable","units", "value", "scenario")))
-  assertthat::assert_that(is.data.table(dat))
+  assert_that(assertthat::has_name(x = dat, which = c("year", "variable","units", "value", "scenario")))
+  assert_that(is.data.table(dat))
   
   process <- intersect(c("ffi_emissions", "luc_emissions"), dat$variable)
   if(length(process) > 0){

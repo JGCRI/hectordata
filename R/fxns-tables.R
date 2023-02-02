@@ -9,6 +9,8 @@
 #' @import assertthat 
 write_hector_csv <- function(x, required=NULL, write_to, info_source, end_tag = "_emiss-constraints_rf"){
   
+  variable <- value <- NULL
+  
   # Format and save the emissions and concentration constraints in the csv files 
   # in the proper Hector table input file. 
   assert_that(dir.exists(write_to))
@@ -23,11 +25,11 @@ write_hector_csv <- function(x, required=NULL, write_to, info_source, end_tag = 
     missing <- !required %in% unique(x[["variable"]])
     assert_that(all(!missing), msg = paste("Missing required variable(s):", paste0(required[missing], collapse = ", ")))
   }
-
+  
   # Transform the data frame into the wide format that Hector expects. 
   # TODO add a check that makes sure contents are unque! There should be no dupplicate values!
   input_data <- dcast(as.data.table(x)[, list(Date = year, variable, value)], Date ~ variable)
- 
+  
   # Add the header information to the csv table. 
   # TODO look into a more efficient way to do this, one that does not 
   # require intermediate products to be written out to the disk. 
@@ -38,12 +40,9 @@ write_hector_csv <- function(x, required=NULL, write_to, info_source, end_tag = 
   var_units <- unique(x[ , list(variable, units)])
   units_list <- paste(c('; UNITS:', var_units$units), collapse = ', ')
   
-  git_tag <- substr(system("git rev-parse HEAD", intern=TRUE), start = 1, stop = 15)
-  create_info <-  c(paste0('; created by hectordata ', date(), 
-                           " commit ", git_tag))
+  create_info <- paste0('; created by hectordata ', date())
   final_lines <- append(c(paste0('; ', scn, " from ", info_source),
                           paste0('; hectordata ', utils::packageVersion(pkg = 'hectordata')),
-                          paste0("; commit ", git_tag), 
                           paste0("; date ", date()), 
                           units_list),
                         lines)
