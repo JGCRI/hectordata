@@ -1,3 +1,6 @@
+# Objective: test specific ini files which are used to build other scenario inputs 
+# such as the pi control inputs which are used to set up all the idealized runs. 
+
 library(hector)
 
 test_that("picontrol concentration", {

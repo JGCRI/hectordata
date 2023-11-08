@@ -1,16 +1,23 @@
+# List all of the ini files in the package we want to make sure that all the 
+# ini's run and then save some selected output to make sure that we can 
+# ensure that Hector behavior does not change. 
+
 library(hector)
 
-# List all of the ini files in the package. 
-# TODO this might pose as an issue in that it requires the package to be built. 
-ini_files <- list.files(system.file("input", package = "hectordata"), 
-                        pattern = "ini", full.names = TRUE)
 
-comparison_dates <- seq(from = 1750, to = 2300, by = 20)
-comparison_vars <- c(GLOBAL_TAS(), RF_TOTAL(), HEAT_FLUX(), CONCENTRATIONS_CO2(),
-                     NPP(), OCEAN_C())
+rslts <- lapply(list.files(file.path("inst", "input"), pattern = "ini", full.names = TRUE),
+                function(ini){
+                  yrs <- floor(seq(from = 1750, to = 2300, length.out = 10))
+                  scn <- basename(ini)
+                  hc <- newcore(inifile = ini, name = scn)
+                  run(hc)
+                  out <- fetchvars(core = hc, dates = yrs)
+                  return(out)
+                })
 
-f <- ini_files[1]
-name <- gsub(pattern = ".ini", x = basename(f), replacement = "")
-hc <- newcore(inifile = f, name = name)
-run(hc, runtodate = max(comparison_dates))
-fetchvars()
+rslt_df <- do.call(what = "rbind", args = rslts)
+
+ofile <- file.path("tests", "testthat", "old_new.csv")
+write.csv(rslt_df, file = ofile, row.names = FALSE)
+
+

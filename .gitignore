@@ -5,6 +5,8 @@
 ./hectordata.Rproj
 .DS_Store
 .Rproj
+.Rbuildignore
+.Rbuildignore.save
 
 planning
 inst/doc
