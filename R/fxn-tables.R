@@ -71,7 +71,8 @@ write_input_table <- function(x, write_to, scn, fname){
   # Add the header information to the csv table. 
   # TODO look into a more efficient way to do this, one that does not 
   # require intermediate products to be written out to the disk. 
-  readr::write_csv(xx, fname, append = FALSE, col_names = TRUE)
+  ofile <- file.path(write_to, fname)
+  readr::write_csv(xx, ofile, append = FALSE, col_names = TRUE)
   lines <- readLines(fname)
   
   unit_list <- paste(c("; UNITS:", var_units$units), collapse = ", ")
@@ -81,7 +82,6 @@ write_input_table <- function(x, write_to, scn, fname){
                           paste0("; commit ", git_tag), 
                           paste0("; date ", date())), 
                         lines)
-  ofile <- file.path(write_to, fname)
   writeLines(final_lines, ofile)
   
   return(ofile)
