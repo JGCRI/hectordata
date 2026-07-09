@@ -1,5 +1,12 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+# Attention
+
+As of July 9 2026 
+
+This repository has been archived and is no longer maintained.
+The code is provided for historical reference and may contain unpatched or unknown vulnerabilities.
+It should not be used in production systems.
+
 
 # hectordata
 
